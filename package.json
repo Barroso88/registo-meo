@@ -1,0 +1,12 @@
+{
+  "name": "registo-mensal-meo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicacao de registo mensal com frontend estatico e backend Express.",
+  "scripts": {
+    "start": "node backend/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

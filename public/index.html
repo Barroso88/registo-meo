@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestor de Vendas</title>
+    <link rel="icon" href="./assets/Logo_MEO.svg.png" type="image/png" />
+    <link rel="apple-touch-icon" href="./assets/Logo_MEO.svg.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="login-screen" id="login-screen">
+      <div class="login-card">
+        <div class="brand login-brand">
+          <img
+            class="brand-logo"
+            src="./assets/MEO_Branco.webp"
+            alt="Logótipo MEO"
+          />
+          <div>
+            <p class="eyebrow">Acesso Restrito</p>
+            <h1>Registo Mensal</h1>
+          </div>
+        </div>
+
+        <p class="login-copy">Usa as tuas credenciais para entrares na aplicacao.</p>
+
+        <form class="login-form" id="login-form">
+          <label>
+            Utilizador
+            <input type="text" name="username" autocomplete="username" value="admin" />
+          </label>
+
+          <label>
+            Password
+            <input type="password" name="password" autocomplete="current-password" />
+          </label>
+
+          <button type="submit" class="primary-button login-button">Entrar</button>
+        </form>
+
+        <p class="login-hint">Credenciais definidas nas Configurações.</p>
+        <p class="login-error" id="login-error" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <img
+            class="brand-logo"
+            src="./assets/MEO_Branco.webp"
+            alt="Logótipo MEO"
+          />
+          <div>
+            <p class="eyebrow">ANDRÉ BARROSO</p>
+            <h1>Registo Mensal</h1>
+          </div>
+        </div>
+
+        <button class="notification-button" id="tasks-notification-button" type="button">
+          <span class="notification-label">Notificações</span>
+          <span class="notification-text" id="tasks-notification-text">Sem tarefas pendentes</span>
+          <span class="notification-badge" id="tasks-notification-badge">0</span>
+        </button>
+
+        <button class="notification-button" id="stock-notification-button" type="button">
+          <span class="notification-label">Por Contactar</span>
+          <span class="notification-text" id="stock-notification-text">Sem pedidos por contactar</span>
+          <span class="notification-badge" id="stock-notification-badge">0</span>
+        </button>
+
+        <nav class="tabs" aria-label="Separadores principais">
+          <button class="tab" data-tab="objetivo">Objetivo</button>
+          <button class="tab" data-tab="faturacao">Faturação</button>
+          <button class="tab" data-tab="movel">Móvel</button>
+          <button class="tab" data-tab="meo-energia">MEO Energia</button>
+          <button class="tab active" data-tab="relatorios">Relatório</button>
+          <button class="tab" data-tab="geral">Geral Mensal</button>
+          <button class="tab" data-tab="tarefas">Tarefas</button>
+          <button class="tab" data-tab="apoio">Apoio</button>
+          <button class="tab" data-tab="incentivos">Incentivos</button>
+          <button class="tab" data-tab="stock">Stock</button>
+          <button class="tab" data-tab="acessos">Acessos</button>
+          <button class="tab" data-tab="configuracoes">Configurações</button>
+        </nav>
+
+        <button class="secondary-button logout-button" id="logout-button" type="button">
+          Sair
+        </button>
+
+      </aside>
+
+      <main class="content">
+        <section class="month-toolbar">
+          <div>
+            <p class="eyebrow">Período de Trabalho</p>
+            <h2 id="selected-month-label">Mês atual</h2>
+          </div>
+
+          <label class="month-picker">
+            Mês
+            <input type="month" id="month-selector" />
+          </label>
+        </section>
+
+        <section class="panel" id="faturacao">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="faturacao" type="color" value="#16286f" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="faturacao" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="faturacao" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="stats-grid">
+            <article class="stat-card">
+              <span>Total de vendas</span>
+              <strong id="total-sales">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Valor acumulado</span>
+              <strong id="total-amount">0,00 €</strong>
+            </article>
+          </div>
+
+          <div class="section-heading top-spacing">
+            <div>
+              <p class="eyebrow">Registo</p>
+              <h2>Adicionar faturação</h2>
+            </div>
+          </div>
+
+          <form class="sales-form" id="sales-form">
+            <label>
+              Data
+              <div class="date-field">
+                <input type="date" name="data" />
+                <button type="button" class="secondary-button date-today-button" data-date-target="billing">
+                  Hoje
+                </button>
+              </div>
+            </label>
+
+            <label>
+              Categoria
+              <select name="categoria">
+                <option value="">Selecionar</option>
+                <option value="Smartphone">Smartphone</option>
+                <option value="Diversidade">Diversidade</option>
+                <option value="Reserva">Reserva</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </label>
+
+            <label>
+              NIF
+              <input type="text" name="nif" placeholder="Número de contribuinte" />
+            </label>
+
+            <label>
+              Equipamento
+              <input type="text" name="equipamento" placeholder="Equipamento" />
+            </label>
+
+            <label>
+              Valor em €
+              <input type="number" name="valor" min="0" step="0.01" placeholder="0.00" />
+            </label>
+
+            <label>
+              Valor sem IVA
+              <input
+                type="text"
+                name="valorSemIva"
+                id="net-value"
+                placeholder="Calculado automaticamente"
+                readonly
+              />
+            </label>
+
+            <label>
+              Seguro
+              <select name="seguro">
+                <option value="">Selecionar</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </label>
+
+            <label>
+              Valor mensal do seguro
+              <select name="valorSeguro" id="insurance-value">
+                <option value="">Selecionar</option>
+                <option value="1.99">1,99 €</option>
+                <option value="2.50">2,50 €</option>
+                <option value="2.99">2,99 €</option>
+                <option value="3.50">3,50 €</option>
+                <option value="3.99">3,99 €</option>
+                <option value="4.99">4,99 €</option>
+                <option value="5.00">5,00 €</option>
+                <option value="5.99">5,99 €</option>
+                <option value="6.50">6,50 €</option>
+                <option value="7.99">7,99 €</option>
+                <option value="8.50">8,50 €</option>
+                <option value="9.99">9,99 €</option>
+                <option value="11.99">11,99 €</option>
+                <option value="12.99">12,99 €</option>
+                <option value="13.99">13,99 €</option>
+                <option value="14.99">14,99 €</option>
+                <option value="15.99">15,99 €</option>
+                <option value="16.99">16,99 €</option>
+                <option value="18.99">18,99 €</option>
+              </select>
+            </label>
+
+            <label>
+              Valor anual do seguro
+              <input
+                type="text"
+                name="valorSeguroAnual"
+                id="insurance-annual-value"
+                placeholder="Calculado automaticamente"
+                readonly
+              />
+            </label>
+
+            <label>
+              IMEI/SN
+              <input type="text" name="imei" placeholder="IMEI ou número de série" />
+            </label>
+
+            <label>
+              Nº Fatura
+              <input type="text" name="fatura" placeholder="Número da fatura" />
+            </label>
+
+            <label>
+              Modalidade
+              <select name="modalidade">
+                <option value="">Selecionar</option>
+                <option value="Pronto Pagamento">Pronto Pagamento</option>
+                <option value="MEOS">MEOS</option>
+                <option value="Vencimento">Vencimento</option>
+                <option value="Prestações">Prestações</option>
+              </select>
+            </label>
+
+            <label class="full-width">
+              Notas
+              <textarea
+                name="notas"
+                rows="4"
+                placeholder="Observações sobre a venda"
+              ></textarea>
+            </label>
+
+            <button type="submit" class="primary-button">Guardar registo</button>
+          </form>
+
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Lista</p>
+                <h3>Faturação registada</h3>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>NIF</th>
+                    <th>Equipamento</th>
+                    <th>Valor</th>
+                    <th>S/ IVA</th>
+                    <th>Seguro</th>
+                    <th>Seguro Mensal</th>
+                    <th>Seguro Anual</th>
+                    <th>Categoria</th>
+                    <th>IMEI/SN</th>
+                    <th>Nº Fatura</th>
+                    <th>Modalidade</th>
+                    <th>Notas</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="sales-table-body">
+                  <tr class="empty-row">
+                    <td colspan="14">Ainda não existem registos de faturação.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="movel">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="movel" type="color" value="#132762" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="movel" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="movel" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="section-heading top-spacing">
+            <div>
+              <p class="eyebrow">Registo</p>
+              <h2>Adicionar registo móvel</h2>
+            </div>
+          </div>
+
+          <form class="sales-form" id="mobile-form">
+            <label>
+              Data
+              <div class="date-field">
+                <input type="date" name="data" />
+                <button type="button" class="secondary-button date-today-button" data-date-target="mobile">
+                  Hoje
+                </button>
+              </div>
+            </label>
+
+            <label>
+              Nome
+              <input type="text" name="nome" placeholder="Nome do cliente" />
+            </label>
+
+            <label>
+              NIF
+              <input type="text" name="nif" placeholder="Número de contribuinte" />
+            </label>
+
+            <label>
+              Número
+              <input type="text" name="numero" placeholder="Número de telemóvel" />
+            </label>
+
+            <label>
+              Tarifário
+              <input type="text" name="tarifario" placeholder="Tarifário" />
+            </label>
+
+            <label>
+              ID Venda
+              <input type="text" name="idVenda" placeholder="Identificador da venda" />
+            </label>
+
+            <label>
+              Fidelização
+              <select name="fidelizacao">
+                <option value="">Selecionar</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </label>
+
+            <label>
+              Portabilidade
+              <select name="portabilidade">
+                <option value="">Selecionar</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </label>
+
+            <label>
+              Best Offer
+              <select name="bestOffer">
+                <option value="">Selecionar</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </label>
+
+            <label>
+              Net Segura
+              <select name="netSegura">
+                <option value="">Selecionar</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </label>
+
+            <label>
+              RCE Aceite
+              <select name="rceAceite">
+                <option value="">Selecionar</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </label>
+
+            <label>
+              Forma de Aceitação
+              <select name="formaAceitacao">
+                <option value="">Selecionar</option>
+                <option value="SMS">SMS</option>
+                <option value="Email">Email</option>
+                <option value="PIN">PIN</option>
+                <option value="Assinado">Assinado</option>
+              </select>
+            </label>
+
+            <button type="submit" class="primary-button">Guardar registo móvel</button>
+          </form>
+
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Lista</p>
+                <h3>Registos móveis</h3>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Nome</th>
+                    <th>NIF</th>
+                    <th>Número</th>
+                    <th>Tarifário</th>
+                    <th>ID Venda</th>
+                    <th>Fidelização</th>
+                    <th>Portabilidade</th>
+                    <th>Best Offer</th>
+                    <th>Net Segura</th>
+                    <th>RCE Aceite</th>
+                    <th>Forma de Aceitação</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="mobile-table-body">
+                  <tr class="empty-row">
+                    <td colspan="13">Ainda não existem registos móveis.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="meo-energia">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="meo-energia" type="color" value="#17304f" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="meo-energia" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="meo-energia" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="section-heading top-spacing">
+            <div>
+              <p class="eyebrow">Registo</p>
+              <h2>Adicionar registo de energia</h2>
+            </div>
+          </div>
+
+          <form class="sales-form" id="energy-form">
+            <label>
+              Data
+              <div class="date-field">
+                <input type="date" name="data" />
+                <button type="button" class="secondary-button date-today-button" data-date-target="energy">
+                  Hoje
+                </button>
+              </div>
+            </label>
+
+            <label>
+              Nome
+              <input type="text" name="nome" placeholder="Nome do cliente" />
+            </label>
+
+            <label>
+              NIF
+              <input type="text" name="nif" placeholder="Número de contribuinte" />
+            </label>
+
+            <label>
+              ID Venda
+              <input type="text" name="idVenda" placeholder="Identificador da venda" />
+            </label>
+
+            <label>
+              Nº Requisição
+              <input type="text" name="requisicao" placeholder="Número da requisição" />
+            </label>
+
+            <label>
+              Potência
+              <select name="potencia">
+                <option value="">Selecionar</option>
+                <option value="1.15">1.15</option>
+                <option value="2.30">2.30</option>
+                <option value="3.45">3.45</option>
+                <option value="4.60">4.60</option>
+                <option value="5.75">5.75</option>
+                <option value="6.90">6.90</option>
+                <option value="10.35">10.35</option>
+                <option value="13.80">13.80</option>
+                <option value="17.25">17.25</option>
+                <option value="20.70">20.70</option>
+                <option value="27.60">27.60</option>
+                <option value="34.50">34.50</option>
+                <option value="41.40">41.40</option>
+              </select>
+            </label>
+
+            <label>
+              Estado
+              <select name="estado">
+                <option value="">Selecionar</option>
+                <option value="Instalado">Instalado</option>
+                <option value="Pendente">Pendente</option>
+                <option value="Rejeitado">Rejeitado</option>
+              </select>
+            </label>
+
+            <label class="full-width">
+              Observações
+              <textarea
+                name="observacoes"
+                rows="4"
+                placeholder="Notas sobre o registo de energia"
+              ></textarea>
+            </label>
+
+            <button type="submit" class="primary-button">Guardar registo de energia</button>
+          </form>
+
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Lista</p>
+                <h3>Registos MEO Energia</h3>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Nome</th>
+                    <th>NIF</th>
+                    <th>ID Venda</th>
+                    <th>Nº Requisição</th>
+                    <th>Potência</th>
+                    <th>Estado</th>
+                    <th>Observações</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="energy-table-body">
+                  <tr class="empty-row">
+                    <td colspan="9">Ainda não existem registos de energia.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel active" id="relatorios">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="relatorios" type="color" value="#14226d" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="relatorios" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="relatorios" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="stats-grid report-stats" id="report-summary-cards">
+            <article class="stat-card">
+              <span>Faturação S/ IVA</span>
+              <strong id="report-total-net">0,00 €</strong>
+            </article>
+            <article class="stat-card">
+              <span>Qtd. Smartphone</span>
+              <strong id="report-total-smartphone">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Qtd. Diversidade</span>
+              <strong id="report-total-diversidade">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Qtd. Seguros</span>
+              <strong id="report-total-seguros">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Qtd. Móvel</span>
+              <strong id="report-total-movel">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Qtd. MEO Energia</span>
+              <strong id="report-total-energia">0</strong>
+            </article>
+          </div>
+
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Resumo por Dia</p>
+                <h3>Relatório consolidado</h3>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Faturação S/ IVA</th>
+                    <th>Qtd. Smartphone</th>
+                    <th>Qtd. Diversidade</th>
+                    <th>Qtd. Seguros</th>
+                    <th>Qtd. Móvel</th>
+                    <th>Qtd. MEO Energia</th>
+                  </tr>
+                </thead>
+                <tbody id="report-table-body">
+                  <tr class="empty-row">
+                    <td colspan="7">Ainda não existem dados para apresentar no relatório.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="configuracoes">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="configuracoes" type="color" value="#1b2557" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="configuracoes" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="configuracoes" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Aspeto</p>
+                <h3>Modo da Aplicação</h3>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <label class="settings-field">
+                Tamanho dos títulos da barra lateral
+                <input type="range" id="menu-font-size" min="12" max="20" step="1" />
+              </label>
+
+              <label class="settings-field">
+                Tema
+                <select id="theme-selector">
+                  <option value="light">Modo Claro</option>
+                  <option value="dark">Modo Escuro</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="section-heading compact top-spacing">
+              <div>
+                <p class="eyebrow">Editor Visual</p>
+                <h3>Ajustes da Interface</h3>
+              </div>
+            </div>
+
+            <div class="settings-grid">
+              <label class="settings-field">
+                Tamanho dos menus
+                <input type="range" id="menu-font-size" min="12" max="20" step="1" />
+              </label>
+
+              <label class="settings-field">
+                Tamanho dos títulos
+                <input type="range" id="title-font-size" min="16" max="34" step="1" />
+              </label>
+
+              <label class="settings-field">
+                Tamanho dos campos
+                <input type="range" id="field-font-size" min="11" max="18" step="1" />
+              </label>
+
+              <label class="settings-field">
+                Tamanho dos cabeçalhos
+                <input type="range" id="panel-header-size" min="10" max="24" step="1" />
+              </label>
+
+              <label class="settings-field">
+                Modo de espaçamento
+                <select id="density-mode">
+                  <option value="compact">Compacto</option>
+                  <option value="normal">Normal</option>
+                </select>
+              </label>
+
+              <label class="settings-field">
+                Cor principal
+                <input type="color" id="primary-color" value="#b6f23b" />
+              </label>
+
+              <label class="settings-field">
+                Cor secundária
+                <input type="color" id="secondary-color" value="#1730a1" />
+              </label>
+
+              <label class="settings-field">
+                Cor da barra lateral
+                <input type="color" id="sidebar-color" value="#102061" />
+              </label>
+
+              <label class="settings-field">
+                Largura dos formulários
+                <input type="range" id="form-width" min="520" max="980" step="10" />
+              </label>
+
+              <label class="settings-field">
+                Arredondamento dos cartões
+                <input type="range" id="card-radius" min="12" max="36" step="1" />
+              </label>
+            </div>
+
+            <div class="section-heading compact top-spacing">
+              <div>
+                <p class="eyebrow">Cores por Página</p>
+                <h3>Separadores Individuais</h3>
+              </div>
+            </div>
+
+            <div class="settings-grid">
+              <label class="settings-field">
+                Relatório
+                <input type="color" id="page-color-relatorios" value="#14226d" />
+              </label>
+
+              <label class="settings-field">
+                Faturação
+                <input type="color" id="page-color-faturacao" value="#16286f" />
+              </label>
+
+              <label class="settings-field">
+                Móvel
+                <input type="color" id="page-color-movel" value="#132762" />
+              </label>
+
+              <label class="settings-field">
+                MEO Energia
+                <input type="color" id="page-color-meo-energia" value="#17304f" />
+              </label>
+
+              <label class="settings-field">
+                Objetivo
+                <input type="color" id="page-color-objetivo" value="#18295f" />
+              </label>
+
+              <label class="settings-field">
+                Geral Mensal
+                <input type="color" id="page-color-geral" value="#11285b" />
+              </label>
+
+              <label class="settings-field">
+                Tarefas
+                <input type="color" id="page-color-tarefas" value="#14325a" />
+              </label>
+
+              <label class="settings-field">
+                Apoio
+                <input type="color" id="page-color-apoio" value="#16245b" />
+              </label>
+
+              <label class="settings-field">
+                Incentivos
+                <input type="color" id="page-color-incentivos" value="#17265a" />
+              </label>
+
+              <label class="settings-field">
+                Stock
+                <input type="color" id="page-color-stock" value="#15315b" />
+              </label>
+
+              <label class="settings-field">
+                Acessos
+                <input type="color" id="page-color-acessos" value="#18295f" />
+              </label>
+
+              <label class="settings-field">
+                Configurações
+                <input type="color" id="page-color-configuracoes" value="#1b2557" />
+              </label>
+            </div>
+
+            <div class="section-heading compact top-spacing">
+              <div>
+                <p class="eyebrow">Barra Lateral</p>
+                <h3>Cores dos Títulos</h3>
+              </div>
+            </div>
+
+            <div class="settings-grid">
+              <label class="settings-field sidebar-tab-color-field">
+                Relatório
+                <input type="color" id="sidebar-tab-color-relatorios" data-sidebar-tab-color="relatorios" value="#b7f43f" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Faturação
+                <input type="color" id="sidebar-tab-color-faturacao" data-sidebar-tab-color="faturacao" value="#8fd7ff" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Móvel
+                <input type="color" id="sidebar-tab-color-movel" data-sidebar-tab-color="movel" value="#74c7ff" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                MEO Energia
+                <input type="color" id="sidebar-tab-color-meo-energia" data-sidebar-tab-color="meo-energia" value="#9be85b" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Objetivo
+                <input type="color" id="sidebar-tab-color-objetivo" data-sidebar-tab-color="objetivo" value="#6fe0b7" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Geral Mensal
+                <input type="color" id="sidebar-tab-color-geral" data-sidebar-tab-color="geral" value="#8ab6ff" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Tarefas
+                <input type="color" id="sidebar-tab-color-tarefas" data-sidebar-tab-color="tarefas" value="#7fdcc8" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Apoio
+                <input type="color" id="sidebar-tab-color-apoio" data-sidebar-tab-color="apoio" value="#9bd0ff" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Incentivos
+                <input type="color" id="sidebar-tab-color-incentivos" data-sidebar-tab-color="incentivos" value="#ffd166" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Stock
+                <input type="color" id="sidebar-tab-color-stock" data-sidebar-tab-color="stock" value="#a8ea33" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Acessos
+                <input type="color" id="sidebar-tab-color-acessos" data-sidebar-tab-color="acessos" value="#c7b2ff" />
+              </label>
+
+              <label class="settings-field sidebar-tab-color-field">
+                Configurações
+                <input type="color" id="sidebar-tab-color-configuracoes" data-sidebar-tab-color="configuracoes" value="#9dc2ff" />
+              </label>
+            </div>
+
+            <div class="section-heading compact top-spacing">
+              <div>
+                <p class="eyebrow">Acesso</p>
+                <h3>Credenciais de Login</h3>
+              </div>
+            </div>
+
+            <form class="settings-grid auth-settings-grid" id="auth-settings-form">
+              <p class="settings-message auth-help">
+                Para alterar o acesso, indica a password atual e depois a nova password.
+              </p>
+
+              <label class="settings-field">
+                Utilizador
+                <input type="text" id="auth-username" name="authUsername" autocomplete="username" />
+              </label>
+
+              <label class="settings-field">
+                Password atual
+                <input
+                  type="password"
+                  id="auth-current-password"
+                  name="authCurrentPassword"
+                  autocomplete="current-password"
+                />
+              </label>
+
+              <label class="settings-field">
+                Nova password
+                <input type="password" id="auth-password" name="authPassword" autocomplete="new-password" />
+              </label>
+
+              <label class="settings-field">
+                Confirmar password
+                <input
+                  type="password"
+                  id="auth-password-confirm"
+                  name="authPasswordConfirm"
+                  autocomplete="new-password"
+                />
+              </label>
+
+              <div class="settings-actions">
+                <p class="settings-message">Se deixares a password em branco, a atual mantém-se.</p>
+                <button type="submit" class="primary-button">Guardar credenciais</button>
+                <p class="settings-message" id="auth-settings-message" aria-live="polite"></p>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel" id="objetivo">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="objetivo" type="color" value="#18295f" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="objetivo" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="objetivo" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="stats-grid report-stats">
+            <article class="stat-card">
+              <span>Objetivo Global Atingido</span>
+              <strong id="goal-total-progress">0%</strong>
+            </article>
+            <article class="stat-card">
+              <span>Faturação</span>
+              <strong id="goal-billing-progress">0%</strong>
+            </article>
+            <article class="stat-card">
+              <span>Móvel</span>
+              <strong id="goal-mobile-progress">0%</strong>
+            </article>
+            <article class="stat-card">
+              <span>MEO Energia</span>
+              <strong id="goal-energy-progress">0%</strong>
+            </article>
+            <article class="stat-card">
+              <span>Seguros</span>
+              <strong id="goal-insurance-progress">0%</strong>
+            </article>
+            <article class="stat-card">
+              <span>Diversidade</span>
+              <strong id="goal-diversity-progress">0%</strong>
+            </article>
+          </div>
+
+          <form class="sales-form" id="goals-form">
+            <label>
+              Objetivo Faturação S/ IVA
+              <input
+                type="number"
+                name="billingGoal"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+              />
+            </label>
+
+            <label>
+              Objetivo Móvel
+              <input
+                type="number"
+                name="mobileGoal"
+                min="0"
+                step="1"
+                placeholder="0"
+              />
+            </label>
+
+            <label>
+              Objetivo MEO Energia
+              <input
+                type="number"
+                name="energyGoal"
+                min="0"
+                step="1"
+                placeholder="0"
+              />
+            </label>
+
+            <button type="submit" class="primary-button">Guardar objetivo do mês</button>
+          </form>
+
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Comparação</p>
+                <h3>Real vs Objetivo</h3>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Categoria</th>
+                    <th>Real do Mês</th>
+                    <th>Objetivo</th>
+                    <th>% Atingido</th>
+                    <th>Peso</th>
+                    <th>Contributo</th>
+                  </tr>
+                </thead>
+                <tbody id="goals-table-body">
+                  <tr>
+                    <td>Faturação</td>
+                    <td id="goal-actual-billing">0,00 €</td>
+                    <td id="goal-target-billing">0,00 €</td>
+                    <td id="goal-percent-billing">0%</td>
+                    <td>50%</td>
+                    <td id="goal-weighted-billing">0%</td>
+                  </tr>
+                  <tr>
+                    <td>Móvel</td>
+                    <td id="goal-actual-mobile">0</td>
+                    <td id="goal-target-mobile">0</td>
+                    <td id="goal-percent-mobile">0%</td>
+                    <td>30%</td>
+                    <td id="goal-weighted-mobile">0%</td>
+                  </tr>
+                  <tr>
+                    <td>MEO Energia</td>
+                    <td id="goal-actual-energy">0</td>
+                    <td id="goal-target-energy">0</td>
+                    <td id="goal-percent-energy">0%</td>
+                    <td>20%</td>
+                    <td id="goal-weighted-energy">0%</td>
+                  </tr>
+                  <tr>
+                    <td>Seguros</td>
+                    <td id="goal-actual-insurance">0%</td>
+                    <td id="goal-target-insurance">15%</td>
+                    <td id="goal-percent-insurance">0%</td>
+                    <td>Indicador</td>
+                    <td id="goal-weighted-insurance">0 / 0</td>
+                  </tr>
+                  <tr>
+                    <td>Diversidade</td>
+                    <td id="goal-actual-diversity">0%</td>
+                    <td id="goal-target-diversity">160%</td>
+                    <td id="goal-percent-diversity">0%</td>
+                    <td>Indicador</td>
+                    <td id="goal-weighted-diversity">0 / 0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="geral">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="geral" type="color" value="#11285b" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="geral" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="geral" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Resumo Mensal</p>
+                <h3>Objetivos por Mês</h3>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Mês</th>
+                    <th>Faturação</th>
+                    <th>Móvel</th>
+                    <th>MEO Energia</th>
+                    <th>Seguros</th>
+                    <th>Diversidade</th>
+                    <th>Global</th>
+                  </tr>
+                </thead>
+                <tbody id="general-table-body">
+                  <tr class="empty-row">
+                    <td colspan="7">Ainda não existem meses com objetivos ou registos.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="tarefas">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="tarefas" type="color" value="#14325a" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="tarefas" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="tarefas" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="stats-grid report-stats">
+            <article class="stat-card">
+              <span>Total de tarefas</span>
+              <strong id="tasks-total-count">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Por concluir</span>
+              <strong id="tasks-open-count">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Concluídas</span>
+              <strong id="tasks-done-count">0</strong>
+            </article>
+          </div>
+
+          <form class="sales-form" id="tasks-form">
+            <label>
+              Tarefa
+              <input type="text" name="title" placeholder="Descrição da tarefa" />
+            </label>
+
+            <label>
+              Data
+              <div class="date-field">
+                <input type="date" name="date" />
+                <button type="button" class="secondary-button date-today-button" data-date-target="task">
+                  Hoje
+                </button>
+              </div>
+            </label>
+
+            <label class="full-width">
+              Notas
+              <textarea name="notes" rows="3" placeholder="Detalhes da tarefa"></textarea>
+            </label>
+
+            <button type="submit" class="primary-button">Guardar tarefa</button>
+          </form>
+
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Lista</p>
+                <h3>Tarefas do mês</h3>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Tarefa</th>
+                    <th>Notas</th>
+                    <th>Estado</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tasks-table-body">
+                  <tr class="empty-row">
+                    <td colspan="5">Ainda não existem tarefas.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="apoio">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="apoio" type="color" value="#16245b" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="apoio" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="apoio" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="support-nav">
+            <button class="support-tab active" data-support-tab="seguros" type="button">
+              Seguros
+            </button>
+          </div>
+
+          <section class="support-panel active" id="support-seguros">
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Referência</p>
+                <h3>Seguros Roubo & Danos Acidentais</h3>
+              </div>
+            </div>
+
+            <div class="support-block support-tone-mobile">
+              <p class="support-title">Seguro Telemóveis</p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>PVP do equipamento</th>
+                      <th>Opção mensal</th>
+                      <th>1 ano</th>
+                      <th>2 anos</th>
+                      <th>Franquia</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>0€ - 70€</td><td>1,99 €</td><td>20 €</td><td>40 €</td><td>10 €</td></tr>
+                    <tr><td>70,01€ - 140€</td><td>2,99 €</td><td>30 €</td><td>60 €</td><td>10 €</td></tr>
+                    <tr><td>140,01€ - 170€</td><td>4,99 €</td><td>50 €</td><td>100 €</td><td>20 €</td></tr>
+                    <tr><td>170,01€ - 270€</td><td>7,99 €</td><td>80 €</td><td>140 €</td><td>30 €</td></tr>
+                    <tr><td>270,01€ - 370€</td><td>9,99 €</td><td>100 €</td><td>180 €</td><td>40 €</td></tr>
+                    <tr><td>370,01€ - 520€</td><td>11,99 €</td><td>120 €</td><td>210 €</td><td>50 €</td></tr>
+                    <tr><td>520,01€ - 790€</td><td>12,99 €</td><td>140 €</td><td>250 €</td><td>60 €</td></tr>
+                    <tr><td>790,01€ - 1000€</td><td>14,99 €</td><td>160 €</td><td>290 €</td><td>70 €</td></tr>
+                    <tr><td>1000,01€ - 1290€</td><td>15,99 €</td><td>170 €</td><td>330 €</td><td>80 €</td></tr>
+                    <tr><td>1290,01€ - 1500€</td><td>16,99 €</td><td>180 €</td><td>350 €</td><td>90 €</td></tr>
+                    <tr><td>1500,01€ - 3000€</td><td>18,99 €</td><td>190 €</td><td>370 €</td><td>120 €</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="support-note">
+                Franquia: paga diretamente à seguradora e apenas no caso de sinistro aceite.
+              </p>
+            </div>
+
+            <div class="support-block support-tone-gadgets">
+              <p class="support-title">Seguro Gadgets - Opção Mensal</p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>PVP do equipamento</th>
+                      <th>Prémio</th>
+                      <th>Franquia</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>€ 0 - € 300</td><td>€ 3,99</td><td>€ 50</td></tr>
+                    <tr><td>€ 300,01 - € 600</td><td>€ 5,99</td><td>€ 60</td></tr>
+                    <tr><td>€ 600,01 - € 1000</td><td>€ 7,99</td><td>€ 80</td></tr>
+                    <tr><td>€ 1.000,01 - € 2.000</td><td>€ 9,99</td><td>€ 120</td></tr>
+                    <tr><td>€ 2.000,01 - € 3.000 *</td><td>€ 11,99</td><td>€ 120</td></tr>
+                    <tr><td>€ 3.000,01 - € 4.000 *</td><td>€ 13,99</td><td>€ 120</td></tr>
+                    <tr><td>€ 4.000,01 - € 4.999 *</td><td>€ 15,99</td><td>€ 120</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="support-note">* Disponível desde 25.02.2025</p>
+            </div>
+
+            <div class="support-block support-tone-tv">
+              <p class="support-title">Seguro TV's - Opção Mensal</p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>PVP do equipamento</th>
+                      <th>Prémio</th>
+                      <th>Franquia</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>€ 0 - € 300</td><td>€ 2,50</td><td>€ 50</td></tr>
+                    <tr><td>€ 300,01 - € 600</td><td>€ 3,50</td><td>€ 60</td></tr>
+                    <tr><td>€ 600,01 - € 1.000</td><td>€ 5,00</td><td>€ 80</td></tr>
+                    <tr><td>€ 1.000,01 - € 2.500</td><td>€ 6,50</td><td>€ 120</td></tr>
+                    <tr><td>€ 2.500,01 - € 4.000 *</td><td>€ 8,50</td><td>€ 120</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="support-note">* Disponível desde 25.02.2025</p>
+            </div>
+          </div>
+          </section>
+        </section>
+
+        <section class="panel" id="incentivos">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="incentivos" type="color" value="#17265a" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="incentivos" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="incentivos" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="stats-grid report-stats">
+            <article class="stat-card">
+              <span>Total de Incentivos</span>
+              <strong id="incentives-total-value">0,00 €</strong>
+            </article>
+            <article class="stat-card">
+              <span>Unidades Lançadas</span>
+              <strong id="incentives-total-quantity">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Modelos com Registo</span>
+              <strong id="incentives-active-models">0</strong>
+            </article>
+          </div>
+
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Campanha</p>
+                <h3>Incentivos por Modelo</h3>
+              </div>
+            </div>
+
+            <div class="support-nav incentives-nav">
+              <button class="support-tab incentive-tab active" data-incentive-tab="samsung" type="button">
+                Samsung
+              </button>
+              <button class="support-tab incentive-tab" data-incentive-tab="honor" type="button">
+                Honor
+              </button>
+              <button class="support-tab incentive-tab" data-incentive-tab="xiaomi" type="button">
+                Xiaomi
+              </button>
+              <button class="support-tab incentive-tab" data-incentive-tab="motorola" type="button">
+                Motorola
+              </button>
+              <button class="support-tab incentive-tab" data-incentive-tab="tcl" type="button">
+                TCL
+              </button>
+              <button class="support-tab incentive-tab" data-incentive-tab="wearables" type="button">
+                Wearables
+              </button>
+              <button class="support-tab incentive-tab" data-incentive-tab="tablets" type="button">
+                Tablet's
+              </button>
+            </div>
+
+            <div id="incentives-content" class="incentives-content">
+              <p class="support-note">A carregar incentivos...</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="stock">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="stock" type="color" value="#15315b" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="stock" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="stock" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="stats-grid report-stats">
+            <article class="stat-card">
+              <span>Total de pedidos</span>
+              <strong id="stock-total-count">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Pedidos efetuados</span>
+              <strong id="stock-pending-count">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Pedidos abastecidos</span>
+              <strong id="stock-completed-count">0</strong>
+            </article>
+          </div>
+
+          <div class="section-heading top-spacing">
+            <div>
+              <p class="eyebrow">Registo</p>
+              <h2>Adicionar pedido de stock</h2>
+            </div>
+          </div>
+
+          <form class="sales-form" id="stock-form">
+            <label>
+              Data do Pedido
+              <input type="date" name="dataPedido" />
+            </label>
+
+            <label>
+              Cliente / Colaborador
+              <input type="text" name="clienteColaborador" placeholder="Nome do cliente ou colaborador" />
+            </label>
+
+            <label>
+              NIF / Nº Colaborador
+              <input type="text" name="identificador" placeholder="NIF ou número de colaborador" />
+            </label>
+
+            <label>
+              Contacto
+              <input type="text" name="contacto" placeholder="Contacto telefónico" />
+            </label>
+
+            <label>
+              Equipamento
+              <input type="text" name="equipamento" placeholder="Equipamento pedido" />
+            </label>
+
+            <label>
+              Estado do Pedido
+              <select name="estadoPedido">
+                <option value="">Selecionar</option>
+                <option value="Pedido Efetuado">Pedido Efetuado</option>
+                <option value="Pedido Abastecido">Pedido Abastecido</option>
+              </select>
+            </label>
+
+            <label>
+              Cliente / Colaborador Contactado
+              <select name="contactado">
+                <option value="">Selecionar</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </label>
+
+            <button type="submit" class="primary-button">Guardar pedido</button>
+          </form>
+
+          <div class="table-card">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Lista</p>
+                <h3>Pedidos de stock</h3>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data do Pedido</th>
+                    <th>Cliente / Colaborador</th>
+                    <th>NIF / Nº Colaborador</th>
+                    <th>Contacto</th>
+                    <th>Equipamento</th>
+                    <th>Estado</th>
+                    <th>Contactado</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="stock-table-body">
+                  <tr class="empty-row">
+                    <td colspan="8">Ainda não existem pedidos de stock.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="acessos">
+          <div class="panel-color-bar">
+            <label class="panel-color-picker">
+              Cor da página
+              <input class="panel-color-input" data-panel-color="acessos" type="color" value="#18295f" />
+            </label>
+            <label class="panel-color-picker">
+              Blocos
+              <input class="panel-block-input" data-panel-block-color="acessos" type="color" value="#13214d" />
+            </label>
+            <label class="panel-color-picker">
+              Campos
+              <input class="panel-field-input" data-panel-field-color="acessos" type="color" value="#0f1f56" />
+            </label>
+          </div>
+          <div class="stats-grid report-stats">
+            <article class="stat-card">
+              <span>Serviços</span>
+              <strong id="access-total-count">0</strong>
+            </article>
+            <article class="stat-card">
+              <span>Com credenciais</span>
+              <strong id="access-filled-count">0</strong>
+            </article>
+          </div>
+
+          <div class="section-heading top-spacing">
+            <div>
+              <p class="eyebrow">Acesso Rápido</p>
+              <h2>Acessos guardados</h2>
+            </div>
+          </div>
+
+          <div class="access-shell">
+            <div class="access-list" id="access-buttons"></div>
+            <div class="access-detail" id="access-detail"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

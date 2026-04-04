@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+public/_pginfo/
+public/_pgbackup/
+public/pgia/

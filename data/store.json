@@ -1,0 +1,70 @@
+{
+  "billingSales": [],
+  "mobileSales": [],
+  "energySales": [],
+  "tasks": [],
+  "stockEntries": [],
+  "monthlyIncentives": {
+    "2026-04": {}
+  },
+  "monthlyGoals": {},
+  "auth": {
+    "username": "Barroso",
+    "passwordHash": "05ee85897d3e11515a716cb96027225bb04f43e5736ca95df89d5930ae6a5c09"
+  },
+  "settings": {
+    "theme": "light",
+    "menuFontSize": 13,
+    "titleFontSize": 20,
+    "fieldFontSize": 13,
+    "panelHeaderSize": 13,
+    "densityMode": "compact",
+    "primaryColor": "#b6f23b",
+    "secondaryColor": "#1730a1",
+    "sidebarColor": "#601024",
+    "pageColors": {
+      "relatorios": "#15146c",
+      "faturacao": "#16286f",
+      "movel": "#132762",
+      "meo-energia": "#0e3913",
+      "objetivo": "#18295f",
+      "geral": "#11285b",
+      "tarefas": "#14325a",
+      "apoio": "#16245b",
+      "incentivos": "#17265a",
+      "stock": "#15315b",
+      "acessos": "#18295f",
+      "configuracoes": "#1b2557"
+    },
+    "pageBlockColors": {
+      "relatorios": "#13214d",
+      "faturacao": "#13214d",
+      "movel": "#13214d",
+      "meo-energia": "#134e4d",
+      "objetivo": "#13214d",
+      "geral": "#13214d",
+      "tarefas": "#13214d",
+      "apoio": "#13214d",
+      "incentivos": "#133c4e",
+      "stock": "#13214d",
+      "acessos": "#13214d",
+      "configuracoes": "#13214d"
+    },
+    "pageFieldColors": {
+      "relatorios": "#0f1f56",
+      "faturacao": "#0f1f56",
+      "movel": "#0f1f56",
+      "meo-energia": "#0f5725",
+      "objetivo": "#0f1f56",
+      "geral": "#0f1f56",
+      "tarefas": "#0f1f56",
+      "apoio": "#0f1f56",
+      "incentivos": "#54deb0",
+      "stock": "#0f1f56",
+      "acessos": "#0f1f56",
+      "configuracoes": "#0f1f56"
+    },
+    "formWidth": 720,
+    "cardRadius": 24
+  }
+}
