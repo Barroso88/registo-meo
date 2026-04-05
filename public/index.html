@@ -175,7 +175,13 @@
 
             <label>
               Valor em €
-              <input type="number" name="valor" min="0" step="0.01" placeholder="0.00" />
+              <input
+                type="text"
+                name="valor"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0,00"
+              />
             </label>
 
             <label>
@@ -277,17 +283,15 @@
             </div>
 
             <div class="table-wrap">
-              <table>
+              <table class="billing-table">
                 <thead>
                   <tr>
                     <th>Data</th>
                     <th>NIF</th>
-                    <th>Equipamento</th>
-                    <th>Valor</th>
+                    <th class="billing-equipment-column">Equipamento</th>
                     <th>S/ IVA</th>
                     <th>Seguro</th>
                     <th>Seguro Mensal</th>
-                    <th>Seguro Anual</th>
                     <th>Categoria</th>
                     <th>IMEI/SN</th>
                     <th>Nº Fatura</th>
@@ -298,7 +302,7 @@
                 </thead>
                 <tbody id="sales-table-body">
                   <tr class="empty-row">
-                    <td colspan="14">Ainda não existem registos de faturação.</td>
+                    <td colspan="12">Ainda não existem registos de faturação.</td>
                   </tr>
                 </tbody>
               </table>
@@ -1344,8 +1348,8 @@
             <label class="calculator-size-control">
               <span>Tamanho da calculadora</span>
               <div class="calculator-size-row">
-                <input type="range" id="calculator-width" min="320" max="560" step="10" />
-                <output id="calculator-width-value">380 px</output>
+                <input type="range" id="calculator-width" min="280" max="420" step="10" />
+                <output id="calculator-width-value">340 px</output>
               </div>
             </label>
 

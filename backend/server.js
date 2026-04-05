@@ -24,6 +24,10 @@ const accessServiceIds = [
   "bec-deposito",
 ];
 
+function clampCalculatorWidth(value) {
+  return Math.min(460, Math.max(280, Number(value) || 360));
+}
+
 function buildDefaultAccessEntries(source = {}) {
   return Object.fromEntries(
     accessServiceIds.map((id) => {
@@ -118,7 +122,7 @@ const defaultState = {
       acessos: "#0f1f56",
       configuracoes: "#0f1f56",
     },
-    calculatorWidth: 380,
+    calculatorWidth: 340,
     formWidth: 720,
     cardRadius: 24,
   },
@@ -451,7 +455,7 @@ function sanitizeState(input) {
               acessos: "#0f1f56",
               configuracoes: "#0f1f56",
             },
-      calculatorWidth: Number(state.settings?.calculatorWidth || 380),
+      calculatorWidth: clampCalculatorWidth(state.settings?.calculatorWidth || 340),
       formWidth: Number(state.settings?.formWidth || 720),
       cardRadius: Number(state.settings?.cardRadius || 24),
     },

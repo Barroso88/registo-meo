@@ -427,7 +427,7 @@ const state = {
     pageColors: { ...DEFAULT_PAGE_COLORS },
     pageBlockColors: { ...DEFAULT_PAGE_BLOCK_COLORS },
     pageFieldColors: { ...DEFAULT_PAGE_FIELD_COLORS },
-    calculatorWidth: 380,
+    calculatorWidth: 340,
     formWidth: 720,
     cardRadius: 24,
   },
@@ -446,6 +446,10 @@ let accessStatusMessage = "";
 let accessStatusError = false;
 let calculatorExpression = "0";
 let calculatorJustEvaluated = false;
+
+function clampCalculatorWidth(value) {
+  return Math.min(460, Math.max(280, Number(value) || 360));
+}
 
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
@@ -805,12 +809,13 @@ billingForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const formData = new FormData(billingForm);
+  const grossValue = parseMoneyInput(formData.get("valor"));
   const sale = {
     data: valueAsText(formData.get("data")),
     nif: valueAsText(formData.get("nif")),
     equipamento: valueAsText(formData.get("equipamento")),
-    valor: Number(formData.get("valor") || 0),
-    valorSemIva: calculateNetValue(Number(formData.get("valor") || 0)),
+    valor: grossValue,
+    valorSemIva: calculateNetValue(grossValue),
     seguro: valueAsText(formData.get("seguro")),
     valorSeguro: Number(formData.get("valorSeguro") || 0),
     valorSeguroAnual: calculateInsuranceAnnual(Number(formData.get("valorSeguro") || 0)),
@@ -956,8 +961,9 @@ stockForm.addEventListener("submit", async (event) => {
 });
 
 grossValueInput.addEventListener("input", () => {
-  const value = Number(grossValueInput.value || 0);
-  netValueInput.value = grossValueInput.value
+  const value = parseMoneyInput(grossValueInput.value);
+  const hasValue = grossValueInput.value.trim().length > 0;
+  netValueInput.value = hasValue
     ? formatPlainCurrency(calculateNetValue(value))
     : "";
 });
@@ -1129,7 +1135,7 @@ async function initialize() {
           ? remoteState.settings.pageFieldColors
           : {}),
       },
-      calculatorWidth: Number(remoteState.settings?.calculatorWidth || 380),
+      calculatorWidth: clampCalculatorWidth(remoteState.settings?.calculatorWidth || 340),
       formWidth: Number(remoteState.settings?.formWidth || 720),
       cardRadius: Number(remoteState.settings?.cardRadius || 24),
     };
@@ -1255,11 +1261,9 @@ function renderBillingSales() {
             <td>${formatDate(sale.data)}</td>
             <td>${escapeHtml(sale.nif || "")}</td>
             <td>${escapeHtml(sale.equipamento || "")}</td>
-            <td>${formatCurrency(Number(sale.valor || 0))}</td>
             <td>${formatCurrency(Number(sale.valorSemIva || 0))}</td>
             <td>${escapeHtml(sale.seguro || "")}</td>
             <td>${formatCurrency(Number(sale.valorSeguro || 0))}</td>
-            <td>${formatCurrency(Number(sale.valorSeguroAnual || 0))}</td>
             <td>${escapeHtml(sale.categoria || "")}</td>
             <td>${escapeHtml(sale.imei || "")}</td>
             <td>${escapeHtml(sale.fatura || "")}</td>
@@ -2027,8 +2031,10 @@ function hydrateVisualEditor() {
   primaryColorInput.value = state.settings.primaryColor;
   secondaryColorInput.value = state.settings.secondaryColor;
   sidebarColorInput.value = state.settings.sidebarColor;
-  if (calculatorWidthInput) calculatorWidthInput.value = String(state.settings.calculatorWidth);
-  if (calculatorWidthValue) calculatorWidthValue.textContent = `${state.settings.calculatorWidth}px`;
+  const calculatorWidth = clampCalculatorWidth(state.settings.calculatorWidth);
+  state.settings.calculatorWidth = calculatorWidth;
+  if (calculatorWidthInput) calculatorWidthInput.value = String(calculatorWidth);
+  if (calculatorWidthValue) calculatorWidthValue.textContent = `${calculatorWidth}px`;
   Object.entries(sidebarTabColorInputs).forEach(([tabId, input]) => {
     if (input) {
       input.value = state.settings.sidebarTabColors?.[tabId] || DEFAULT_SIDEBAR_TAB_COLORS[tabId];
@@ -2083,7 +2089,7 @@ async function handleVisualSettingsChange() {
   state.settings.pageColors = Object.fromEntries(
     Object.entries(pageColorInputs).map(([panelId, input]) => [panelId, input.value])
   );
-  state.settings.calculatorWidth = Number(calculatorWidthInput?.value || 380);
+  state.settings.calculatorWidth = clampCalculatorWidth(calculatorWidthInput?.value || 340);
   state.settings.formWidth = Number(formWidthInput.value);
   state.settings.cardRadius = Number(cardRadiusInput.value);
   applyVisualSettings();
@@ -2176,7 +2182,7 @@ async function handleCalculatorWidthChange(event) {
   const target = event.target;
   if (!(target instanceof HTMLInputElement)) return;
 
-  state.settings.calculatorWidth = Number(target.value);
+  state.settings.calculatorWidth = clampCalculatorWidth(target.value);
   if (calculatorWidthValue) calculatorWidthValue.textContent = `${state.settings.calculatorWidth}px`;
 
   applyVisualSettings();
@@ -2198,7 +2204,9 @@ function applyVisualSettings() {
   document.documentElement.style.setProperty("--surface-strong", state.settings.secondaryColor);
   document.documentElement.style.setProperty("--accent-soft", state.settings.secondaryColor);
   document.documentElement.style.setProperty("--sidebar-bg", state.settings.sidebarColor);
-  document.documentElement.style.setProperty("--calculator-width", `${state.settings.calculatorWidth}px`);
+  const calculatorWidth = clampCalculatorWidth(state.settings.calculatorWidth);
+  state.settings.calculatorWidth = calculatorWidth;
+  document.documentElement.style.setProperty("--calculator-width", `${calculatorWidth}px`);
   tabs.forEach((tab) => {
     const tabId = tab.dataset.tab;
     if (!tabId) return;
@@ -2296,11 +2304,11 @@ function formatMonth(value) {
 }
 
 function calculateNetValue(value) {
-  return value / 1.23;
+  return Number((value / 1.23).toFixed(2));
 }
 
 function calculateInsuranceAnnual(value) {
-  return value * 12;
+  return Number((value * 12).toFixed(2));
 }
 
 function formatPlainCurrency(value) {
@@ -2352,6 +2360,18 @@ function getBillingEffectiveValue(sale) {
 
 function valueAsText(value) {
   return value?.toString().trim() || "";
+}
+
+function parseMoneyInput(value) {
+  const normalized = String(value || "")
+    .trim()
+    .replace(/\s/g, "")
+    .replace(",", ".");
+
+  if (!normalized) return 0;
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function createIncentiveId(brand, section, name) {
@@ -2469,7 +2489,7 @@ function appendCalculatorValue(value) {
   }
 
   if (value === "%") {
-    if (!/[0-9%]$/.test(calculatorExpression)) return;
+    if (!/[0-9)%]$/.test(calculatorExpression)) return;
     calculatorExpression += "%";
     updateCalculatorDisplay();
     return;
@@ -2495,22 +2515,11 @@ function evaluateCalculator() {
     return;
   }
 
-  expression = expression.replace(/(\d+(?:\.\d+)?)%/g, "($1/100)");
-
-  if (!/^[0-9+\-*/().\s]+$/.test(expression)) {
-    calculatorExpression = "Erro";
-    calculatorJustEvaluated = false;
-    updateCalculatorDisplay();
-    return;
-  }
-
   try {
-    const result = Function(`"use strict"; return (${expression});`)();
+    const result = calculateCalculatorExpression(expression);
     if (!Number.isFinite(result)) throw new Error("Resultado inválido.");
 
-    calculatorExpression = Number.isInteger(result)
-      ? String(result)
-      : String(Number.parseFloat(Number(result).toFixed(12)));
+    calculatorExpression = formatCalculatorResult(result);
     calculatorJustEvaluated = true;
     updateCalculatorDisplay();
   } catch {
@@ -2518,6 +2527,172 @@ function evaluateCalculator() {
     calculatorJustEvaluated = false;
     updateCalculatorDisplay();
   }
+}
+
+function calculateCalculatorExpression(rawExpression) {
+  const tokens = tokenizeCalculatorExpression(rawExpression);
+  let index = 0;
+
+  function peek() {
+    return tokens[index] || null;
+  }
+
+  function consume() {
+    return tokens[index++] || null;
+  }
+
+  function isUnaryPosition() {
+    const previous = tokens[index - 1];
+    return (
+      !previous ||
+      previous.type === "operator" ||
+      (previous.type === "paren" && previous.value === "(")
+    );
+  }
+
+  function parseExpression() {
+    let left = parseTerm();
+    if (left.percent) {
+      left.value /= 100;
+      left.percent = false;
+    }
+
+    while (peek() && peek().type === "operator" && (peek().value === "+" || peek().value === "-")) {
+      const operator = consume().value;
+      const right = parseTerm();
+      const rightValue = right.percent ? (left.value * right.value) / 100 : right.value;
+      left = {
+        value: operator === "+" ? left.value + rightValue : left.value - rightValue,
+        percent: false,
+      };
+    }
+
+    return left;
+  }
+
+  function parseTerm() {
+    let left = parseFactor();
+
+    if (left.percent && peek() && peek().type === "operator" && (peek().value === "*" || peek().value === "/")) {
+      left.value /= 100;
+      left.percent = false;
+    }
+
+    while (peek() && peek().type === "operator" && (peek().value === "*" || peek().value === "/")) {
+      const operator = consume().value;
+      const right = parseFactor();
+      const rightValue = right.percent ? right.value / 100 : right.value;
+
+      left = {
+        value: operator === "*" ? left.value * rightValue : left.value / rightValue,
+        percent: false,
+      };
+    }
+
+    return left;
+  }
+
+  function parseFactor() {
+    let sign = 1;
+    while (peek() && peek().type === "operator" && (peek().value === "+" || peek().value === "-") && isUnaryPosition()) {
+      if (consume().value === "-") sign *= -1;
+    }
+
+    const token = peek();
+    if (!token) throw new Error("Expressão incompleta.");
+
+    let result;
+    if (token.type === "number") {
+      consume();
+      result = { value: Number(token.value), percent: false };
+    } else if (token.type === "paren" && token.value === "(") {
+      consume();
+      result = parseExpression();
+      const closing = consume();
+      if (!closing || closing.type !== "paren" || closing.value !== ")") {
+        throw new Error("Parênteses inválidos.");
+      }
+    } else {
+      throw new Error("Expressão inválida.");
+    }
+
+    if (peek() && peek().type === "percent") {
+      consume();
+      result.percent = true;
+    }
+
+    result.value *= sign;
+    return result;
+  }
+
+  const parsed = parseExpression();
+  if (index < tokens.length) {
+    throw new Error("Expressão inválida.");
+  }
+
+  return parsed.value;
+}
+
+function tokenizeCalculatorExpression(expression) {
+  const tokens = [];
+  let index = 0;
+  const normalized = String(expression).replaceAll(",", ".");
+
+  while (index < normalized.length) {
+    const character = normalized[index];
+
+    if (/\s/.test(character)) {
+      index += 1;
+      continue;
+    }
+
+    if (/[0-9.]/.test(character)) {
+      let number = character;
+      index += 1;
+      while (index < normalized.length && /[0-9.]/.test(normalized[index])) {
+        number += normalized[index];
+        index += 1;
+      }
+
+      if ((number.match(/\./g) || []).length > 1 || number === ".") {
+        throw new Error("Número inválido.");
+      }
+
+      tokens.push({ type: "number", value: number });
+      continue;
+    }
+
+    if ("+-*/".includes(character)) {
+      tokens.push({ type: "operator", value: character });
+      index += 1;
+      continue;
+    }
+
+    if (character === "(" || character === ")") {
+      tokens.push({ type: "paren", value: character });
+      index += 1;
+      continue;
+    }
+
+    if (character === "%") {
+      tokens.push({ type: "percent", value: character });
+      index += 1;
+      continue;
+    }
+
+    throw new Error("Caractere inválido.");
+  }
+
+  return tokens;
+}
+
+function formatCalculatorResult(value) {
+  const normalized = Number.parseFloat(Number(value).toFixed(12));
+  if (Number.isInteger(normalized)) {
+    return String(normalized);
+  }
+
+  return String(normalized).replace(/\.0+$/, "").replace(/(\.\d*?)0+$/, "$1");
 }
 
 async function copyTextToClipboard(value) {

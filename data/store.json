@@ -41,7 +41,13 @@
   "monthlyIncentives": {
     "2026-04": {}
   },
-  "monthlyGoals": {},
+  "monthlyGoals": {
+    "2026-04": {
+      "billing": 0,
+      "mobile": 0,
+      "energy": 0
+    }
+  },
   "auth": {
     "username": "Barroso",
     "passwordHash": "05ee85897d3e11515a716cb96027225bb04f43e5736ca95df89d5930ae6a5c09"
@@ -50,8 +56,8 @@
     "theme": "light",
     "menuFontSize": 12,
     "titleFontSize": 20,
-    "fieldFontSize": 13,
-    "panelHeaderSize": 10,
+    "fieldFontSize": 15,
+    "panelHeaderSize": 13,
     "densityMode": "compact",
     "primaryColor": "#b6f23b",
     "secondaryColor": "#1730a1",
@@ -112,6 +118,7 @@
       "acessos": "#0f1f56",
       "configuracoes": "#0f1f56"
     },
+    "calculatorWidth": 380,
     "formWidth": 580,
     "cardRadius": 24
   }
