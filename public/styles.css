@@ -19,6 +19,8 @@
   --form-max-width: 720px;
   --card-radius: 24px;
   --density-padding: 24px;
+  --month-toolbar-bg: #b3262d;
+  --month-toolbar-text: #fff7f8;
   --panel-bg-relatorios: #14226d;
   --panel-bg-faturacao: #16286f;
   --panel-bg-movel: #132762;
@@ -884,8 +886,9 @@ body.authenticated .login-screen {
   margin-bottom: 20px;
   padding: 22px 24px;
   border-radius: var(--card-radius);
-  background: var(--surface);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--month-toolbar-bg, var(--surface));
+  color: var(--month-toolbar-text, var(--text));
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
 }
@@ -902,6 +905,10 @@ body.authenticated .login-screen {
   gap: 8px;
   min-width: 220px;
   font-weight: 700;
+}
+
+.month-toolbar .eyebrow {
+  color: inherit;
 }
 
 .month-picker input {

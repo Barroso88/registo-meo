@@ -57,6 +57,7 @@ const densityModeInput = document.getElementById("density-mode");
 const primaryColorInput = document.getElementById("primary-color");
 const secondaryColorInput = document.getElementById("secondary-color");
 const sidebarColorInput = document.getElementById("sidebar-color");
+const toolbarColorInput = document.getElementById("toolbar-color");
 const formWidthInput = document.getElementById("form-width");
 const cardRadiusInput = document.getElementById("card-radius");
 const pageColorInputs = {
@@ -423,6 +424,7 @@ const state = {
     primaryColor: "#b6f23b",
     secondaryColor: "#1730a1",
     sidebarColor: "#102061",
+    toolbarColor: "#b3262d",
     sidebarTabColors: { ...DEFAULT_SIDEBAR_TAB_COLORS },
     pageColors: { ...DEFAULT_PAGE_COLORS },
     pageBlockColors: { ...DEFAULT_PAGE_BLOCK_COLORS },
@@ -774,6 +776,7 @@ densityModeInput.addEventListener("input", handleVisualSettingsChange);
 primaryColorInput.addEventListener("input", handleVisualSettingsChange);
 secondaryColorInput.addEventListener("input", handleVisualSettingsChange);
 sidebarColorInput.addEventListener("input", handleVisualSettingsChange);
+toolbarColorInput.addEventListener("input", handleVisualSettingsChange);
 calculatorWidthInput.addEventListener("input", handleCalculatorWidthChange);
 formWidthInput.addEventListener("input", handleVisualSettingsChange);
 cardRadiusInput.addEventListener("input", handleVisualSettingsChange);
@@ -1109,6 +1112,7 @@ async function initialize() {
       primaryColor: remoteState.settings?.primaryColor || "#b6f23b",
       secondaryColor: remoteState.settings?.secondaryColor || "#1730a1",
       sidebarColor: remoteState.settings?.sidebarColor || "#102061",
+      toolbarColor: remoteState.settings?.toolbarColor || "#b3262d",
       sidebarTabColors: {
         ...DEFAULT_SIDEBAR_TAB_COLORS,
         ...(remoteState.settings?.sidebarTabColors && typeof remoteState.settings.sidebarTabColors === "object"
@@ -2031,6 +2035,7 @@ function hydrateVisualEditor() {
   primaryColorInput.value = state.settings.primaryColor;
   secondaryColorInput.value = state.settings.secondaryColor;
   sidebarColorInput.value = state.settings.sidebarColor;
+  toolbarColorInput.value = state.settings.toolbarColor;
   const calculatorWidth = clampCalculatorWidth(state.settings.calculatorWidth);
   state.settings.calculatorWidth = calculatorWidth;
   if (calculatorWidthInput) calculatorWidthInput.value = String(calculatorWidth);
@@ -2083,6 +2088,7 @@ async function handleVisualSettingsChange() {
   state.settings.primaryColor = primaryColorInput.value;
   state.settings.secondaryColor = secondaryColorInput.value;
   state.settings.sidebarColor = sidebarColorInput.value;
+  state.settings.toolbarColor = toolbarColorInput.value;
   state.settings.sidebarTabColors = Object.fromEntries(
     Object.entries(sidebarTabColorInputs).map(([tabId, input]) => [tabId, input?.value || DEFAULT_SIDEBAR_TAB_COLORS[tabId]])
   );
@@ -2204,6 +2210,8 @@ function applyVisualSettings() {
   document.documentElement.style.setProperty("--surface-strong", state.settings.secondaryColor);
   document.documentElement.style.setProperty("--accent-soft", state.settings.secondaryColor);
   document.documentElement.style.setProperty("--sidebar-bg", state.settings.sidebarColor);
+  document.documentElement.style.setProperty("--month-toolbar-bg", state.settings.toolbarColor);
+  document.documentElement.style.setProperty("--month-toolbar-text", getReadableTextColor(state.settings.toolbarColor));
   const calculatorWidth = clampCalculatorWidth(state.settings.calculatorWidth);
   state.settings.calculatorWidth = calculatorWidth;
   document.documentElement.style.setProperty("--calculator-width", `${calculatorWidth}px`);

@@ -62,6 +62,7 @@
     "primaryColor": "#b6f23b",
     "secondaryColor": "#1730a1",
     "sidebarColor": "#601024",
+    "toolbarColor": "#59d93f",
     "sidebarTabColors": {
       "relatorios": "#b7f43f",
       "faturacao": "#8fd7ff",
