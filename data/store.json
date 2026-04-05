@@ -55,7 +55,7 @@
   },
   "settings": {
     "theme": "light",
-    "menuFontSize": 13,
+    "menuFontSize": 16,
     "titleFontSize": 20,
     "fieldFontSize": 15,
     "panelHeaderSize": 13,
@@ -63,7 +63,7 @@
     "primaryColor": "#1b61ac",
     "secondaryColor": "#4a6887",
     "sidebarColor": "#0648b2",
-    "toolbarColor": "#0a11e6",
+    "toolbarColor": "#101e89",
     "sidebarTabColors": {
       "relatorios": "#b7f43f",
       "faturacao": "#8fd7ff",
@@ -101,7 +101,7 @@
       "geral": "#13214d",
       "tarefas": "#13214d",
       "apoio": "#071541",
-      "incentivos": "#133c4e",
+      "incentivos": "#000361",
       "stock": "#13214d",
       "acessos": "#13214d",
       "configuracoes": "#13214d"
@@ -115,7 +115,7 @@
       "geral": "#0f1f56",
       "tarefas": "#0f1f56",
       "apoio": "#50368c",
-      "incentivos": "#54deb0",
+      "incentivos": "#ebf5f1",
       "stock": "#0f1f56",
       "acessos": "#0f1f56",
       "configuracoes": "#0f1f56"
