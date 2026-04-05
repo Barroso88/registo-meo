@@ -14,7 +14,7 @@
         <div class="brand login-brand">
           <img
             class="brand-logo"
-            src="./assets/MEO_Branco.webp"
+            src="./assets/Logo_MEO.svg.png"
             alt="Logótipo MEO"
           />
           <div>
@@ -49,12 +49,16 @@
         <div class="brand">
           <img
             class="brand-logo"
-            src="./assets/MEO_Branco.webp"
+            src="./assets/Logo_MEO.svg.png"
             alt="Logótipo MEO"
           />
           <div>
-            <p class="eyebrow">ANDRÉ BARROSO</p>
-            <h1>Registo Mensal</h1>
+            <p style="margin: 0 0 2px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.16em; font-size: 1.05rem; font-weight: 900;">
+              ANDRÉ BARROSO
+            </p>
+            <h1 style="margin: 0; font-size: 0.92rem; line-height: 1; font-weight: 700; letter-spacing: 0.03em; opacity: 0.92;">
+              Registo Mensal
+            </h1>
           </div>
         </div>
 
@@ -75,7 +79,7 @@
           <button class="tab" data-tab="faturacao">Faturação</button>
           <button class="tab" data-tab="movel">Móvel</button>
           <button class="tab" data-tab="meo-energia">MEO Energia</button>
-          <button class="tab active" data-tab="relatorios">Relatório</button>
+          <button class="tab active" data-tab="relatorios">Relatório Mensal</button>
           <button class="tab" data-tab="geral">Geral Mensal</button>
           <button class="tab" data-tab="tarefas">Tarefas</button>
           <button class="tab" data-tab="apoio">Apoio</button>
@@ -1240,6 +1244,9 @@
             <button class="support-tab active" data-support-tab="seguros" type="button">
               Seguros
             </button>
+            <button class="support-tab" data-support-tab="calculadora" type="button">
+              Calculadora
+            </button>
           </div>
 
           <section class="support-panel active" id="support-seguros">
@@ -1332,6 +1339,80 @@
               <p class="support-note">* Disponível desde 25.02.2025</p>
             </div>
           </div>
+          </section>
+          <section class="support-panel" id="support-calculadora">
+            <label class="calculator-size-control">
+              <span>Tamanho da calculadora</span>
+              <div class="calculator-size-row">
+                <input type="range" id="calculator-width" min="320" max="560" step="10" />
+                <output id="calculator-width-value">380 px</output>
+              </div>
+            </label>
+
+            <div class="table-card calculator-card">
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Ferramenta</p>
+                  <h3>Calculadora Rápida</h3>
+                </div>
+              </div>
+
+              <div class="calculator-shell">
+                <div class="calculator-display-wrap">
+                  <p class="support-note">Use os botões abaixo para fazer contas simples.</p>
+                  <input
+                    id="calculator-display"
+                    class="calculator-display"
+                    type="text"
+                    value="0"
+                    readonly
+                    aria-label="Visor da calculadora"
+                  />
+                </div>
+
+                <div class="calculator-grid" aria-label="Teclado da calculadora">
+                  <button class="calculator-key calculator-ghost" type="button" data-calculator-action="clear">
+                    C
+                  </button>
+                  <button class="calculator-key calculator-ghost" type="button" data-calculator-action="backspace">
+                    ⌫
+                  </button>
+                  <button class="calculator-key calculator-operator" type="button" data-calculator-value="%">
+                    %
+                  </button>
+                  <button class="calculator-key calculator-operator" type="button" data-calculator-value="/">
+                    ÷
+                  </button>
+                  <button class="calculator-key calculator-operator" type="button" data-calculator-value="*">
+                    ×
+                  </button>
+
+                  <button class="calculator-key" type="button" data-calculator-value="7">7</button>
+                  <button class="calculator-key" type="button" data-calculator-value="8">8</button>
+                  <button class="calculator-key" type="button" data-calculator-value="9">9</button>
+                  <button class="calculator-key calculator-operator" type="button" data-calculator-value="-">
+                    −
+                  </button>
+
+                  <button class="calculator-key" type="button" data-calculator-value="4">4</button>
+                  <button class="calculator-key" type="button" data-calculator-value="5">5</button>
+                  <button class="calculator-key" type="button" data-calculator-value="6">6</button>
+                  <button class="calculator-key calculator-operator" type="button" data-calculator-value="+">
+                    +
+                  </button>
+
+                  <button class="calculator-key" type="button" data-calculator-value="1">1</button>
+                  <button class="calculator-key" type="button" data-calculator-value="2">2</button>
+                  <button class="calculator-key" type="button" data-calculator-value="3">3</button>
+                  <button class="calculator-key calculator-equals" type="button" data-calculator-action="equals">
+                    =
+                  </button>
+
+                  <button class="calculator-key calculator-wide" type="button" data-calculator-value="0">0</button>
+                  <button class="calculator-key" type="button" data-calculator-value=".">,</button>
+                </div>
+              </div>
+            </div>
           </section>
         </section>
 

@@ -45,6 +45,9 @@ const stockNotificationBadge = document.getElementById("stock-notification-badge
 const todayButtons = document.querySelectorAll(".date-today-button");
 const supportTabs = document.querySelectorAll(".support-tab");
 const supportPanels = document.querySelectorAll(".support-panel");
+const calculatorDisplay = document.getElementById("calculator-display");
+const calculatorWidthInput = document.getElementById("calculator-width");
+const calculatorWidthValue = document.getElementById("calculator-width-value");
 const incentiveTabs = document.querySelectorAll(".incentive-tab");
 const menuFontSizeInput = document.getElementById("menu-font-size");
 const titleFontSizeInput = document.getElementById("title-font-size");
@@ -424,6 +427,7 @@ const state = {
     pageColors: { ...DEFAULT_PAGE_COLORS },
     pageBlockColors: { ...DEFAULT_PAGE_BLOCK_COLORS },
     pageFieldColors: { ...DEFAULT_PAGE_FIELD_COLORS },
+    calculatorWidth: 380,
     formWidth: 720,
     cardRadius: 24,
   },
@@ -440,6 +444,8 @@ let selectedAccessService = ACCESS_SERVICES[0].id;
 let accessPasswordVisible = false;
 let accessStatusMessage = "";
 let accessStatusError = false;
+let calculatorExpression = "0";
+let calculatorJustEvaluated = false;
 
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
@@ -509,7 +515,7 @@ accessDetail?.addEventListener("click", async (event) => {
     }
 
     try {
-      await navigator.clipboard.writeText(value);
+      await copyTextToClipboard(value);
       accessStatusMessage = `${target.dataset.copyAccessValue === "user" ? "User" : "Password"} copiado para ${service?.label || "o serviço selecionado"}.`;
       accessStatusError = false;
       renderAccesses();
@@ -541,6 +547,85 @@ accessDetail?.addEventListener("submit", async (event) => {
   accessStatusMessage = "Credenciais guardadas com sucesso.";
   accessStatusError = false;
   await persistAndRender();
+});
+
+document.addEventListener("click", (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+
+  const calculatorButton = target.closest("[data-calculator-value], [data-calculator-action]");
+  if (!(calculatorButton instanceof HTMLElement)) return;
+  if (!calculatorButton.closest("#support-calculadora")) return;
+
+  const value = calculatorButton.dataset.calculatorValue;
+  const action = calculatorButton.dataset.calculatorAction;
+
+  if (value !== undefined) {
+    appendCalculatorValue(value);
+    return;
+  }
+
+  if (action === "clear") {
+    clearCalculator();
+    return;
+  }
+
+  if (action === "backspace") {
+    backspaceCalculator();
+    return;
+  }
+
+  if (action === "equals") {
+    evaluateCalculator();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (!isCalculatorKeyboardActive()) return;
+
+  const key = event.key;
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+  if (/^\d$/.test(key)) {
+    event.preventDefault();
+    appendCalculatorValue(key);
+    return;
+  }
+
+  if (key === "," || key === ".") {
+    event.preventDefault();
+    appendCalculatorValue(".");
+    return;
+  }
+
+  if (["+", "-", "*", "/"].includes(key)) {
+    event.preventDefault();
+    appendCalculatorValue(key);
+    return;
+  }
+
+  if (key === "%") {
+    event.preventDefault();
+    appendCalculatorValue("%");
+    return;
+  }
+
+  if (key === "Enter" || key === "=") {
+    event.preventDefault();
+    evaluateCalculator();
+    return;
+  }
+
+  if (key === "Backspace") {
+    event.preventDefault();
+    backspaceCalculator();
+    return;
+  }
+
+  if (key === "Escape") {
+    event.preventDefault();
+    clearCalculator();
+  }
 });
 
 tasksNotificationButton.addEventListener("click", () => {
@@ -685,6 +770,7 @@ densityModeInput.addEventListener("input", handleVisualSettingsChange);
 primaryColorInput.addEventListener("input", handleVisualSettingsChange);
 secondaryColorInput.addEventListener("input", handleVisualSettingsChange);
 sidebarColorInput.addEventListener("input", handleVisualSettingsChange);
+calculatorWidthInput.addEventListener("input", handleCalculatorWidthChange);
 formWidthInput.addEventListener("input", handleVisualSettingsChange);
 cardRadiusInput.addEventListener("input", handleVisualSettingsChange);
 Object.values(pageColorInputs).forEach((input) => {
@@ -1043,6 +1129,7 @@ async function initialize() {
           ? remoteState.settings.pageFieldColors
           : {}),
       },
+      calculatorWidth: Number(remoteState.settings?.calculatorWidth || 380),
       formWidth: Number(remoteState.settings?.formWidth || 720),
       cardRadius: Number(remoteState.settings?.cardRadius || 24),
     };
@@ -1147,6 +1234,12 @@ function renderAll() {
   renderGoals();
   renderGeneral();
   renderIncentives();
+  updateCalculatorDisplay();
+}
+
+function isCalculatorKeyboardActive() {
+  const calculatorPanel = document.getElementById("support-calculadora");
+  return Boolean(calculatorPanel?.classList.contains("active"));
 }
 
 function renderBillingSales() {
@@ -1934,6 +2027,8 @@ function hydrateVisualEditor() {
   primaryColorInput.value = state.settings.primaryColor;
   secondaryColorInput.value = state.settings.secondaryColor;
   sidebarColorInput.value = state.settings.sidebarColor;
+  if (calculatorWidthInput) calculatorWidthInput.value = String(state.settings.calculatorWidth);
+  if (calculatorWidthValue) calculatorWidthValue.textContent = `${state.settings.calculatorWidth}px`;
   Object.entries(sidebarTabColorInputs).forEach(([tabId, input]) => {
     if (input) {
       input.value = state.settings.sidebarTabColors?.[tabId] || DEFAULT_SIDEBAR_TAB_COLORS[tabId];
@@ -1988,6 +2083,7 @@ async function handleVisualSettingsChange() {
   state.settings.pageColors = Object.fromEntries(
     Object.entries(pageColorInputs).map(([panelId, input]) => [panelId, input.value])
   );
+  state.settings.calculatorWidth = Number(calculatorWidthInput?.value || 380);
   state.settings.formWidth = Number(formWidthInput.value);
   state.settings.cardRadius = Number(cardRadiusInput.value);
   applyVisualSettings();
@@ -2076,6 +2172,17 @@ async function handleSidebarTabColorChange(event) {
   await persistState();
 }
 
+async function handleCalculatorWidthChange(event) {
+  const target = event.target;
+  if (!(target instanceof HTMLInputElement)) return;
+
+  state.settings.calculatorWidth = Number(target.value);
+  if (calculatorWidthValue) calculatorWidthValue.textContent = `${state.settings.calculatorWidth}px`;
+
+  applyVisualSettings();
+  await persistState();
+}
+
 function applyVisualSettings() {
   const densityPadding = state.settings.densityMode === "normal" ? 24 : 18;
   document.documentElement.style.setProperty("--menu-font-size", `${state.settings.menuFontSize}px`);
@@ -2091,6 +2198,7 @@ function applyVisualSettings() {
   document.documentElement.style.setProperty("--surface-strong", state.settings.secondaryColor);
   document.documentElement.style.setProperty("--accent-soft", state.settings.secondaryColor);
   document.documentElement.style.setProperty("--sidebar-bg", state.settings.sidebarColor);
+  document.documentElement.style.setProperty("--calculator-width", `${state.settings.calculatorWidth}px`);
   tabs.forEach((tab) => {
     const tabId = tab.dataset.tab;
     if (!tabId) return;
@@ -2270,6 +2378,175 @@ function emptyRow(colspan, text) {
       <td colspan="${colspan}">${text}</td>
     </tr>
   `;
+}
+
+function updateCalculatorDisplay() {
+  if (!calculatorDisplay) return;
+  calculatorDisplay.value = formatCalculatorDisplayValue(calculatorExpression);
+}
+
+function formatCalculatorDisplayValue(value) {
+  return String(value || "0").replaceAll(".", ",");
+}
+
+function clearCalculator() {
+  calculatorExpression = "0";
+  calculatorJustEvaluated = false;
+  updateCalculatorDisplay();
+}
+
+function backspaceCalculator() {
+  if (calculatorExpression === "Erro" || calculatorJustEvaluated) {
+    calculatorExpression = "0";
+    calculatorJustEvaluated = false;
+    updateCalculatorDisplay();
+    return;
+  }
+
+  calculatorExpression = calculatorExpression.slice(0, -1) || "0";
+  if (calculatorExpression === "-" || calculatorExpression === "") {
+    calculatorExpression = "0";
+  }
+  updateCalculatorDisplay();
+}
+
+function appendCalculatorValue(value) {
+  if (!value) return;
+
+  if (calculatorExpression === "Erro" || calculatorJustEvaluated) {
+    if (/[0-9.]/.test(value)) {
+      calculatorExpression = value === "." ? "0." : value;
+      calculatorJustEvaluated = false;
+      updateCalculatorDisplay();
+      return;
+    }
+
+    calculatorJustEvaluated = false;
+  }
+
+  if (calculatorExpression === "0") {
+    if (/[0-9]/.test(value)) {
+      calculatorExpression = value;
+      updateCalculatorDisplay();
+      return;
+    }
+
+    if (value === ".") {
+      calculatorExpression = "0.";
+      updateCalculatorDisplay();
+      return;
+    }
+
+    if (value === "-") {
+      calculatorExpression = "-";
+      updateCalculatorDisplay();
+      return;
+    }
+
+    if (value === "%") {
+      return;
+    }
+  }
+
+  const lastChar = calculatorExpression.slice(-1);
+  if (/[+\-*/]/.test(lastChar) && /[+\-*/]/.test(value)) {
+    calculatorExpression = `${calculatorExpression.slice(0, -1)}${value}`;
+    updateCalculatorDisplay();
+    return;
+  }
+
+  if (value === ".") {
+    const segments = calculatorExpression.split(/[+\-*/]/);
+    const currentSegment = segments[segments.length - 1] || "";
+    if (currentSegment.includes(".")) return;
+    if (/[+\-*/]$/.test(calculatorExpression)) {
+      calculatorExpression += "0.";
+    } else {
+      calculatorExpression += ".";
+    }
+    updateCalculatorDisplay();
+    return;
+  }
+
+  if (value === "%") {
+    if (!/[0-9%]$/.test(calculatorExpression)) return;
+    calculatorExpression += "%";
+    updateCalculatorDisplay();
+    return;
+  }
+
+  calculatorExpression += value;
+  updateCalculatorDisplay();
+}
+
+function evaluateCalculator() {
+  let expression = calculatorExpression.trim();
+  if (!expression || expression === "Erro") {
+    clearCalculator();
+    return;
+  }
+
+  while (/[+\-*/.]$/.test(expression)) {
+    expression = expression.slice(0, -1);
+  }
+
+  if (!expression) {
+    clearCalculator();
+    return;
+  }
+
+  expression = expression.replace(/(\d+(?:\.\d+)?)%/g, "($1/100)");
+
+  if (!/^[0-9+\-*/().\s]+$/.test(expression)) {
+    calculatorExpression = "Erro";
+    calculatorJustEvaluated = false;
+    updateCalculatorDisplay();
+    return;
+  }
+
+  try {
+    const result = Function(`"use strict"; return (${expression});`)();
+    if (!Number.isFinite(result)) throw new Error("Resultado inválido.");
+
+    calculatorExpression = Number.isInteger(result)
+      ? String(result)
+      : String(Number.parseFloat(Number(result).toFixed(12)));
+    calculatorJustEvaluated = true;
+    updateCalculatorDisplay();
+  } catch {
+    calculatorExpression = "Erro";
+    calculatorJustEvaluated = false;
+    updateCalculatorDisplay();
+  }
+}
+
+async function copyTextToClipboard(value) {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(value);
+      return;
+    } catch {
+      // Fallback below.
+    }
+  }
+
+  const helper = document.createElement("textarea");
+  helper.value = value;
+  helper.setAttribute("readonly", "true");
+  helper.style.position = "fixed";
+  helper.style.top = "-9999px";
+  helper.style.left = "-9999px";
+  helper.style.opacity = "0";
+  document.body.appendChild(helper);
+  helper.select();
+  helper.setSelectionRange(0, helper.value.length);
+
+  const copied = document.execCommand("copy");
+  document.body.removeChild(helper);
+
+  if (!copied) {
+    throw new Error("Falha ao copiar para a área de transferência.");
+  }
 }
 
 function escapeHtml(value) {

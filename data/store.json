@@ -4,6 +4,40 @@
   "energySales": [],
   "tasks": [],
   "stockEntries": [],
+  "accessEntries": {
+    "sap-comercial": {
+      "user": "se244634718",
+      "password": "NayaraAndre*2028"
+    },
+    "portal-sfa": {
+      "user": "",
+      "password": ""
+    },
+    "user-rede": {
+      "user": "",
+      "password": ""
+    },
+    "pos-venda": {
+      "user": "",
+      "password": ""
+    },
+    "blueticket": {
+      "user": "",
+      "password": ""
+    },
+    "intelcia": {
+      "user": "",
+      "password": ""
+    },
+    "eform": {
+      "user": "",
+      "password": ""
+    },
+    "bec-deposito": {
+      "user": "",
+      "password": ""
+    }
+  },
   "monthlyIncentives": {
     "2026-04": {}
   },
@@ -14,19 +48,33 @@
   },
   "settings": {
     "theme": "light",
-    "menuFontSize": 13,
+    "menuFontSize": 12,
     "titleFontSize": 20,
     "fieldFontSize": 13,
-    "panelHeaderSize": 13,
+    "panelHeaderSize": 10,
     "densityMode": "compact",
     "primaryColor": "#b6f23b",
     "secondaryColor": "#1730a1",
     "sidebarColor": "#601024",
+    "sidebarTabColors": {
+      "relatorios": "#b7f43f",
+      "faturacao": "#8fd7ff",
+      "movel": "#74c7ff",
+      "meo-energia": "#9be85b",
+      "objetivo": "#6fe0b7",
+      "geral": "#8ab6ff",
+      "tarefas": "#7fdcc8",
+      "apoio": "#9bd0ff",
+      "incentivos": "#ffd166",
+      "stock": "#a8ea33",
+      "acessos": "#c7b2ff",
+      "configuracoes": "#9dc2ff"
+    },
     "pageColors": {
       "relatorios": "#15146c",
       "faturacao": "#16286f",
       "movel": "#132762",
-      "meo-energia": "#0e3913",
+      "meo-energia": "#110e39",
       "objetivo": "#18295f",
       "geral": "#11285b",
       "tarefas": "#14325a",
@@ -40,7 +88,7 @@
       "relatorios": "#13214d",
       "faturacao": "#13214d",
       "movel": "#13214d",
-      "meo-energia": "#134e4d",
+      "meo-energia": "#162550",
       "objetivo": "#13214d",
       "geral": "#13214d",
       "tarefas": "#13214d",
@@ -54,7 +102,7 @@
       "relatorios": "#0f1f56",
       "faturacao": "#0f1f56",
       "movel": "#0f1f56",
-      "meo-energia": "#0f5725",
+      "meo-energia": "#1e3a67",
       "objetivo": "#0f1f56",
       "geral": "#0f1f56",
       "tarefas": "#0f1f56",
@@ -64,7 +112,7 @@
       "acessos": "#0f1f56",
       "configuracoes": "#0f1f56"
     },
-    "formWidth": 720,
+    "formWidth": 580,
     "cardRadius": 24
   }
 }
