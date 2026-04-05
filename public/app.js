@@ -25,6 +25,7 @@ const accessFilledCount = document.getElementById("access-filled-count");
 
 const monthSelector = document.getElementById("month-selector");
 const selectedMonthLabel = document.getElementById("selected-month-label");
+const sidebarSearchInput = document.getElementById("sidebar-search");
 const themeSelector = document.getElementById("theme-selector");
 const loginScreen = document.getElementById("login-screen");
 const loginForm = document.getElementById("login-form");
@@ -448,6 +449,13 @@ let accessStatusMessage = "";
 let accessStatusError = false;
 let calculatorExpression = "0";
 let calculatorJustEvaluated = false;
+let searchNavigationActive = false;
+let sidebarSearchState = {
+  query: "",
+  matches: [],
+  index: -1,
+  activeKey: "",
+};
 
 function clampCalculatorWidth(value) {
   return Math.min(460, Math.max(280, Number(value) || 360));
@@ -455,6 +463,7 @@ function clampCalculatorWidth(value) {
 
 tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
+    if (!searchNavigationActive) clearSearchHighlights();
     activateTab(tab.dataset.tab);
   });
 });
@@ -462,6 +471,7 @@ tabs.forEach((tab) => {
 supportTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     if (tab.classList.contains("incentive-tab")) return;
+    if (!searchNavigationActive) clearSearchHighlights();
     const target = tab.dataset.supportTab;
     supportTabs.forEach((item) => item.classList.toggle("active", item === tab));
     supportPanels.forEach((panel) =>
@@ -472,10 +482,17 @@ supportTabs.forEach((tab) => {
 
 incentiveTabs.forEach((tab) => {
   tab.addEventListener("click", () => {
+    if (!searchNavigationActive) clearSearchHighlights();
     selectedIncentiveBrand = tab.dataset.incentiveTab || "samsung";
     incentiveTabs.forEach((item) => item.classList.toggle("active", item === tab));
     renderIncentives();
   });
+});
+
+sidebarSearchInput?.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter") return;
+  event.preventDefault();
+  performSidebarSearch(sidebarSearchInput.value);
 });
 
 accessButtons?.addEventListener("click", (event) => {
@@ -488,6 +505,7 @@ accessButtons?.addEventListener("click", (event) => {
   const serviceId = button.dataset.accessService;
   if (!serviceId) return;
 
+  if (!searchNavigationActive) clearSearchHighlights();
   selectedAccessService = serviceId;
   accessPasswordVisible = false;
   accessStatusMessage = "";
@@ -1735,7 +1753,7 @@ function renderIncentives() {
       .join("");
 
     return `
-      <section class="incentive-brand ${selectedIncentiveBrand === brandId ? "active" : ""}">
+      <section class="incentive-brand ${selectedIncentiveBrand === brandId ? "active" : ""}" data-incentive-brand="${brandId}">
         <div class="section-heading compact">
           <div>
             <p class="eyebrow">Marca</p>
@@ -1867,6 +1885,407 @@ function activateTab(targetId) {
   tabs.forEach((item) => item.classList.toggle("active", item.dataset.tab === targetId));
   panels.forEach((panel) => panel.classList.toggle("active", panel.id === targetId));
   applyVisualSettings();
+}
+
+function normalizeSearchText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function rankSearchElement(element, query) {
+  const normalizedText = normalizeSearchText(element.textContent);
+  let score = normalizedText.length;
+
+  if (normalizedText === query) score -= 1000;
+  if (element.matches(".tab, .support-tab, .incentive-tab, .access-service-button")) score -= 350;
+  if (element.matches("h1, h2, h3, .support-title, .access-service-label, .contact-item span")) {
+    score -= 120;
+  }
+  if (element.matches(".panel, .support-panel, .incentive-brand")) score += 200;
+
+  return score;
+}
+
+function getSearchTargetKey(target, element) {
+  const fallbackKey = `raw:${element?.tagName || "unknown"}:${normalizeSearchText(element?.textContent || "").slice(0, 60)}`;
+
+  if (!(element instanceof HTMLElement) || !target) {
+    return fallbackKey;
+  }
+
+  if (target.kind === "main-tab") return `main:${target.tabId}`;
+  if (target.kind === "support-tab") return `support:${target.supportTabId}`;
+  if (target.kind === "support-panel") return `support-panel:${target.supportTabId}`;
+  if (target.kind === "incentive-brand" || target.kind === "incentive-panel") return `brand:${target.brandId}`;
+  if (target.kind === "access-service") return `access:${target.serviceId}`;
+  if (target.kind === "panel") return `panel:${target.tabId}`;
+
+  return fallbackKey;
+}
+
+function resolveSearchTarget(element) {
+  const accessButton = element.closest(".access-service-button");
+  if (accessButton) {
+    return {
+      kind: "access-service",
+      serviceId: accessButton.dataset.accessService || "",
+      element: accessButton,
+    };
+  }
+
+  const incentiveTab = element.closest(".incentive-tab");
+  if (incentiveTab) {
+    return {
+      kind: "incentive-brand",
+      brandId: incentiveTab.dataset.incentiveTab || "",
+      element: incentiveTab,
+    };
+  }
+
+  const supportTab = element.closest(".support-tab");
+  if (supportTab && !supportTab.classList.contains("incentive-tab")) {
+    return {
+      kind: "support-tab",
+      supportTabId: supportTab.dataset.supportTab || "",
+      element: supportTab,
+    };
+  }
+
+  const mainTab = element.closest(".tab");
+  if (mainTab) {
+    return {
+      kind: "main-tab",
+      tabId: mainTab.dataset.tab || "",
+      element: mainTab,
+    };
+  }
+
+  const supportPanel = element.closest(".support-panel");
+  if (supportPanel) {
+    return {
+      kind: "support-panel",
+      supportTabId: supportPanel.id.replace(/^support-/, ""),
+      element: supportPanel,
+    };
+  }
+
+  const incentiveBrand = element.closest(".incentive-brand");
+  if (incentiveBrand) {
+    return {
+      kind: "incentive-panel",
+      brandId: incentiveBrand.dataset.incentiveBrand || "",
+      element: incentiveBrand,
+    };
+  }
+
+  const panel = element.closest(".panel");
+  if (panel) {
+    return {
+      kind: "panel",
+      tabId: panel.id,
+      element: panel,
+    };
+  }
+
+  return null;
+}
+
+function findSearchTarget(query) {
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) return null;
+
+  const matches = findSearchMatches(normalizedQuery);
+  if (!matches.length) return null;
+
+  const bestMatch = matches[0];
+  return resolveSearchTarget(bestMatch) || { kind: "raw", element: bestMatch };
+}
+
+function findSearchMatches(query) {
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) return [];
+
+  const candidates = Array.from(document.querySelectorAll("body *")).filter((element) => {
+    if (!(element instanceof HTMLElement)) return false;
+    if (["SCRIPT", "STYLE", "NOSCRIPT"].includes(element.tagName)) return false;
+    const text = normalizeSearchText(element.textContent);
+    return text.includes(normalizedQuery);
+  });
+
+  if (!candidates.length) return [];
+
+  candidates.sort((a, b) => rankSearchElement(a, normalizedQuery) - rankSearchElement(b, normalizedQuery));
+
+  const seen = new Set();
+  return candidates
+    .map((element) => {
+      const target = resolveSearchTarget(element) || { kind: "raw", element };
+      const key = getSearchTargetKey(target, element);
+
+      if (seen.has(key)) return null;
+      seen.add(key);
+      return { ...target, element, searchKey: key };
+    })
+    .filter(Boolean);
+}
+
+function highlightSearchResult(element) {
+  if (!(element instanceof HTMLElement)) return;
+}
+
+function focusSearchTarget(target) {
+  if (!target) return;
+
+  if (target.kind === "main-tab" && target.tabId) {
+    searchNavigationActive = true;
+    activateTab(target.tabId);
+    window.setTimeout(() => {
+      const panel = document.getElementById(target.tabId);
+      panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+      highlightSearchResult(panel || target.element);
+      highlightSearchText(panel || target.element, sidebarSearchInput?.value || "");
+      searchNavigationActive = false;
+    }, 60);
+    return;
+  }
+
+  if (target.kind === "support-tab" && target.supportTabId) {
+    searchNavigationActive = true;
+    activateTab("apoio");
+    const button = Array.from(supportTabs).find(
+      (item) => !item.classList.contains("incentive-tab") && item.dataset.supportTab === target.supportTabId
+    );
+    button?.click();
+    window.setTimeout(() => {
+      const panel = document.getElementById(`support-${target.supportTabId}`);
+      panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+      highlightSearchResult(panel || target.element);
+      highlightSearchText(panel || target.element, sidebarSearchInput?.value || "");
+      searchNavigationActive = false;
+    }, 80);
+    return;
+  }
+
+  if (target.kind === "support-panel" && target.supportTabId) {
+    searchNavigationActive = true;
+    activateTab("apoio");
+    const button = Array.from(supportTabs).find(
+      (item) => !item.classList.contains("incentive-tab") && item.dataset.supportTab === target.supportTabId
+    );
+    button?.click();
+    window.setTimeout(() => {
+      const panel = document.getElementById(`support-${target.supportTabId}`);
+      panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+      highlightSearchResult(panel || target.element);
+      highlightSearchText(panel || target.element, sidebarSearchInput?.value || "");
+      searchNavigationActive = false;
+    }, 80);
+    return;
+  }
+
+  if ((target.kind === "incentive-brand" || target.kind === "incentive-panel") && target.brandId) {
+    searchNavigationActive = true;
+    activateTab("incentivos");
+    selectedIncentiveBrand = target.brandId;
+    incentiveTabs.forEach((item) => item.classList.toggle("active", item.dataset.incentiveTab === target.brandId));
+    renderIncentives();
+    window.setTimeout(() => {
+      const brand = document.querySelector(`.incentive-brand[data-incentive-brand="${target.brandId}"]`);
+      brand?.scrollIntoView({ behavior: "smooth", block: "start" });
+      highlightSearchResult(brand || target.element);
+      highlightSearchText(brand || target.element, sidebarSearchInput?.value || "");
+      searchNavigationActive = false;
+    }, 80);
+    return;
+  }
+
+  if (target.kind === "access-service" && target.serviceId) {
+    searchNavigationActive = true;
+    activateTab("acessos");
+    selectedAccessService = target.serviceId;
+    accessPasswordVisible = false;
+    accessStatusMessage = "";
+    accessStatusError = false;
+    renderAccesses();
+    window.setTimeout(() => {
+      const detail = document.getElementById("access-detail");
+      detail?.scrollIntoView({ behavior: "smooth", block: "start" });
+      highlightSearchResult(detail || target.element);
+      highlightSearchText(detail || target.element, sidebarSearchInput?.value || "");
+      searchNavigationActive = false;
+    }, 80);
+    return;
+  }
+
+  if (target.kind === "panel" && target.tabId) {
+    searchNavigationActive = true;
+    activateTab(target.tabId);
+    window.setTimeout(() => {
+      const panel = document.getElementById(target.tabId);
+      panel?.scrollIntoView({ behavior: "smooth", block: "start" });
+      highlightSearchResult(panel || target.element);
+      highlightSearchText(panel || target.element, sidebarSearchInput?.value || "");
+      searchNavigationActive = false;
+    }, 60);
+    return;
+  }
+
+  const fallbackElement = target.element instanceof HTMLElement ? target.element : null;
+  fallbackElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+  highlightSearchResult(fallbackElement || undefined);
+  highlightSearchText(fallbackElement || undefined, sidebarSearchInput?.value || "");
+  searchNavigationActive = false;
+}
+
+function performSidebarSearch(query) {
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) return;
+
+  const matches = findSearchMatches(normalizedQuery);
+  if (!matches.length) {
+    clearSearchHighlights();
+    sidebarSearchState = {
+      query: normalizedQuery,
+      matches: [],
+      index: -1,
+      activeKey: "",
+    };
+    return;
+  }
+
+  const sameQuery = sidebarSearchState.query === normalizedQuery;
+  sidebarSearchState.matches = matches;
+  sidebarSearchState.query = normalizedQuery;
+
+  let nextIndex = 0;
+  if (sameQuery && sidebarSearchState.activeKey) {
+    const currentIndex = matches.findIndex((match) => match.searchKey === sidebarSearchState.activeKey);
+    nextIndex =
+      currentIndex === -1 ? (sidebarSearchState.index + 1) % matches.length : (currentIndex + 1) % matches.length;
+  }
+
+  sidebarSearchState.index = nextIndex;
+  sidebarSearchState.activeKey = matches[nextIndex]?.searchKey || "";
+
+  clearSearchHighlights();
+  focusSearchTarget(matches[nextIndex]);
+}
+
+function clearSearchHighlights() {
+  document.querySelectorAll(".search-hit-term").forEach((node) => {
+    const textNode = document.createTextNode(node.textContent || "");
+    node.replaceWith(textNode);
+  });
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function normalizeForSearch(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function findSearchRange(text, query) {
+  const normalizedText = normalizeForSearch(text);
+  const normalizedQuery = normalizeForSearch(query);
+  if (!normalizedQuery) return null;
+
+  const index = normalizedText.indexOf(normalizedQuery);
+  if (index === -1) return null;
+
+  let normalizedPosition = 0;
+  let start = -1;
+  let end = -1;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const normalizedChar = text[i]
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+    for (let j = 0; j < normalizedChar.length; j += 1) {
+      if (normalizedPosition === index && start === -1) start = i;
+      if (normalizedPosition === index + normalizedQuery.length - 1) {
+        end = i + 1;
+      }
+      normalizedPosition += 1;
+    }
+  }
+
+  if (start === -1 || end === -1) return null;
+  return { start, end };
+}
+
+function highlightSearchText(element, query) {
+  if (!(element instanceof HTMLElement)) return;
+  const normalizedQuery = normalizeForSearch(query);
+  if (!normalizedQuery) return;
+
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      const parent = node.parentElement;
+      if (!parent) return NodeFilter.FILTER_REJECT;
+      if (parent.closest(".search-hit-term")) return NodeFilter.FILTER_REJECT;
+      if (["SCRIPT", "STYLE", "NOSCRIPT"].includes(parent.tagName)) return NodeFilter.FILTER_REJECT;
+      if (!normalizeForSearch(node.textContent).includes(normalizedQuery)) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    },
+  });
+
+  const textNodes = [];
+  while (walker.nextNode()) {
+    textNodes.push(walker.currentNode);
+  }
+
+  textNodes.forEach((node) => {
+    const text = node.textContent || "";
+    const fragment = document.createDocumentFragment();
+    let cursor = 0;
+    let matched = false;
+
+    while (cursor < text.length) {
+      const range = findSearchRange(text.slice(cursor), normalizedQuery);
+      if (!range) break;
+
+      matched = true;
+      const start = cursor + range.start;
+      const end = cursor + range.end;
+
+      if (start > cursor) {
+        fragment.append(document.createTextNode(text.slice(cursor, start)));
+      }
+
+      const mark = document.createElement("mark");
+      mark.className = "search-hit-term";
+      mark.textContent = text.slice(start, end);
+      fragment.append(mark);
+      cursor = end;
+    }
+
+    if (matched) {
+      if (cursor < text.length) {
+        fragment.append(document.createTextNode(text.slice(cursor)));
+      }
+      node.replaceWith(fragment);
+    }
+  });
+}
+
+function resetSidebarSearchState() {
+  sidebarSearchState = {
+    query: "",
+    matches: [],
+    index: -1,
+    activeKey: "",
+  };
 }
 
 function getReportEntry(summaryByDate, date) {
