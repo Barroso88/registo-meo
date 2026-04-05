@@ -11,6 +11,11 @@
   --accent-soft: #21348f;
   --success: #8fd52f;
   --shadow: 0 24px 60px rgba(7, 10, 41, 0.32);
+  --sidebar-tab-bg: rgba(4, 14, 34, 0.78);
+  --sidebar-tab-bg-hover: rgba(8, 20, 46, 0.88);
+  --sidebar-tab-bg-active: rgba(12, 26, 54, 0.98);
+  --sidebar-tab-border: rgba(255, 255, 255, 0.08);
+  --sidebar-tab-glow: rgba(255, 255, 255, 0.45);
   --menu-font-size: 0.94rem;
   --title-font-size: 1.35rem;
   --field-font-size: 0.84rem;
@@ -325,13 +330,13 @@ body.authenticated .login-screen {
 }
 
 .tab {
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--sidebar-tab-border);
   text-align: left;
   border-radius: 18px;
   padding: 12px 15px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
-    rgba(4, 14, 34, 0.78);
+    var(--sidebar-tab-bg);
   color: var(--text);
   cursor: pointer;
   transition:
@@ -361,7 +366,7 @@ body.authenticated .login-screen {
 .tab:hover {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03)),
-    rgba(8, 20, 46, 0.88);
+    var(--sidebar-tab-bg-hover);
   box-shadow:
     0 12px 24px rgba(0, 0, 0, 0.22),
     inset 0 0 0 1px rgba(255, 255, 255, 0.09),
@@ -371,10 +376,10 @@ body.authenticated .login-screen {
 .tab.active {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05)),
-    rgba(12, 26, 54, 0.98);
+    var(--sidebar-tab-bg-active);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.62),
-    0 0 18px rgba(255, 255, 255, 0.45),
+    0 0 18px var(--sidebar-tab-glow),
     0 0 32px rgba(255, 255, 255, 0.18),
     0 12px 26px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.16);

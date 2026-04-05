@@ -55,7 +55,7 @@
   },
   "settings": {
     "theme": "light",
-    "menuFontSize": 12,
+    "menuFontSize": 15,
     "titleFontSize": 20,
     "fieldFontSize": 15,
     "panelHeaderSize": 13,
