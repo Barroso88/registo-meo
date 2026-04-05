@@ -67,6 +67,7 @@ const defaultState = {
     secondaryColor: "#1730a1",
     sidebarColor: "#102061",
     sidebarButtonColor: "#20316f",
+    sidebarButtonStyle: "style-1",
     toolbarColor: "#b3262d",
     sidebarTabColors: {
       relatorios: "#b7f43f",
@@ -390,6 +391,7 @@ function sanitizeState(input) {
       secondaryColor: state.settings?.secondaryColor || "#1730a1",
       sidebarColor: state.settings?.sidebarColor || "#102061",
       sidebarButtonColor: state.settings?.sidebarButtonColor || "#20316f",
+      sidebarButtonStyle: state.settings?.sidebarButtonStyle || "style-1",
       toolbarColor: state.settings?.toolbarColor || "#b3262d",
       sidebarTabColors:
         state.settings?.sidebarTabColors && typeof state.settings.sidebarTabColors === "object"

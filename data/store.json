@@ -55,7 +55,7 @@
   },
   "settings": {
     "theme": "light",
-    "menuFontSize": 15,
+    "menuFontSize": 13,
     "titleFontSize": 20,
     "fieldFontSize": 15,
     "panelHeaderSize": 13,
@@ -69,7 +69,7 @@
       "faturacao": "#8fd7ff",
       "movel": "#74c7ff",
       "meo-energia": "#9be85b",
-      "objetivo": "#6fe0b7",
+      "objetivo": "#ffffff",
       "geral": "#8ab6ff",
       "tarefas": "#7fdcc8",
       "apoio": "#9bd0ff",

@@ -59,6 +59,7 @@ const primaryColorInput = document.getElementById("primary-color");
 const secondaryColorInput = document.getElementById("secondary-color");
 const sidebarColorInput = document.getElementById("sidebar-color");
 const sidebarButtonColorInput = document.getElementById("sidebar-button-color");
+const sidebarButtonStyleInput = document.getElementById("sidebar-button-style");
 const toolbarColorInput = document.getElementById("toolbar-color");
 const formWidthInput = document.getElementById("form-width");
 const cardRadiusInput = document.getElementById("card-radius");
@@ -427,6 +428,7 @@ const state = {
   secondaryColor: "#1730a1",
   sidebarColor: "#102061",
   sidebarButtonColor: "#20316f",
+  sidebarButtonStyle: "style-1",
   toolbarColor: "#b3262d",
     sidebarTabColors: { ...DEFAULT_SIDEBAR_TAB_COLORS },
     pageColors: { ...DEFAULT_PAGE_COLORS },
@@ -797,6 +799,7 @@ primaryColorInput.addEventListener("input", handleVisualSettingsChange);
 secondaryColorInput.addEventListener("input", handleVisualSettingsChange);
 sidebarColorInput.addEventListener("input", handleVisualSettingsChange);
 sidebarButtonColorInput?.addEventListener("input", handleVisualSettingsChange);
+sidebarButtonStyleInput?.addEventListener("input", handleVisualSettingsChange);
 toolbarColorInput.addEventListener("input", handleVisualSettingsChange);
 calculatorWidthInput.addEventListener("input", handleCalculatorWidthChange);
 formWidthInput.addEventListener("input", handleVisualSettingsChange);
@@ -1134,6 +1137,7 @@ async function initialize() {
       secondaryColor: remoteState.settings?.secondaryColor || "#1730a1",
       sidebarColor: remoteState.settings?.sidebarColor || "#102061",
       sidebarButtonColor: remoteState.settings?.sidebarButtonColor || "#20316f",
+      sidebarButtonStyle: remoteState.settings?.sidebarButtonStyle || "style-1",
       toolbarColor: remoteState.settings?.toolbarColor || "#b3262d",
       sidebarTabColors: {
         ...DEFAULT_SIDEBAR_TAB_COLORS,
@@ -2459,6 +2463,7 @@ function hydrateVisualEditor() {
   secondaryColorInput.value = state.settings.secondaryColor;
   sidebarColorInput.value = state.settings.sidebarColor;
   if (sidebarButtonColorInput) sidebarButtonColorInput.value = state.settings.sidebarButtonColor;
+  if (sidebarButtonStyleInput) sidebarButtonStyleInput.value = state.settings.sidebarButtonStyle || "style-1";
   toolbarColorInput.value = state.settings.toolbarColor;
   const calculatorWidth = clampCalculatorWidth(state.settings.calculatorWidth);
   state.settings.calculatorWidth = calculatorWidth;
@@ -2513,6 +2518,7 @@ async function handleVisualSettingsChange() {
   state.settings.secondaryColor = secondaryColorInput.value;
   state.settings.sidebarColor = sidebarColorInput.value;
   state.settings.sidebarButtonColor = sidebarButtonColorInput?.value || "#20316f";
+  state.settings.sidebarButtonStyle = sidebarButtonStyleInput?.value || "style-1";
   state.settings.toolbarColor = toolbarColorInput.value;
   state.settings.sidebarTabColors = Object.fromEntries(
     Object.entries(sidebarTabColorInputs).map(([tabId, input]) => [tabId, input?.value || DEFAULT_SIDEBAR_TAB_COLORS[tabId]])
@@ -2642,6 +2648,23 @@ async function handleCalculatorWidthChange(event) {
 
 function applyVisualSettings() {
   const densityPadding = state.settings.densityMode === "normal" ? 24 : 18;
+  const sidebarButtonScale = Math.max(0.88, Math.min(1.38, state.settings.menuFontSize / 15));
+  const sidebarButtonBase = state.settings.sidebarButtonColor || "#20316f";
+  const sidebarButtonHover = shadeColor(sidebarButtonBase, -10);
+  const sidebarButtonActive = shadeColor(sidebarButtonBase, -16);
+  const sidebarButtonBorder = shadeColor(sidebarButtonBase, -24);
+  const sidebarButtonGlow = hexToRgba(shadeColor(sidebarButtonBase, 18), 0.28);
+  const sidebarButtonPadY = Math.round(11 + (sidebarButtonScale - 1) * 10);
+  const sidebarButtonPadX = Math.round(15 + (sidebarButtonScale - 1) * 8);
+  const sidebarButtonPadLeft = Math.round(17 + (sidebarButtonScale - 1) * 8);
+  const sidebarButtonRadius = Math.round(12 + (sidebarButtonScale - 1) * 10);
+  const sidebarButtonShadow = `0 ${Math.round(9 + (sidebarButtonScale - 1) * 4)}px ${Math.round(20 + (sidebarButtonScale - 1) * 8)}px rgba(0, 0, 0, 0.18)`;
+  const sidebarButtonHoverShadow = `0 ${Math.round(11 + (sidebarButtonScale - 1) * 4)}px ${Math.round(22 + (sidebarButtonScale - 1) * 8)}px rgba(0, 0, 0, 0.22)`;
+  const sidebarButtonActiveShadow = `0 ${Math.round(12 + (sidebarButtonScale - 1) * 4)}px ${Math.round(24 + (sidebarButtonScale - 1) * 8)}px rgba(0, 0, 0, 0.25)`;
+  const sidebarButtonLift = `${Math.round((sidebarButtonScale - 1) * 2)}px`;
+  const sidebarButtonHoverLift = `${Math.round(-2 - (sidebarButtonScale - 1) * 2)}px`;
+  const sidebarButtonActiveLift = `${Math.round(-1 - (sidebarButtonScale - 1) * 1)}px`;
+  const sidebarButtonWidth = `${Math.max(84, Math.min(100, 92 + (sidebarButtonScale - 1) * 16)).toFixed(2)}%`;
   document.documentElement.style.setProperty("--menu-font-size", `${state.settings.menuFontSize}px`);
   document.documentElement.style.setProperty("--title-font-size", `${state.settings.titleFontSize}px`);
   document.documentElement.style.setProperty("--field-font-size", `${state.settings.fieldFontSize}px`);
@@ -2655,11 +2678,13 @@ function applyVisualSettings() {
   document.documentElement.style.setProperty("--surface-strong", state.settings.secondaryColor);
   document.documentElement.style.setProperty("--accent-soft", shadeColor(state.settings.secondaryColor, 14));
   document.documentElement.style.setProperty("--sidebar-bg", state.settings.sidebarColor);
-  document.documentElement.style.setProperty("--sidebar-tab-bg", hexToRgba(state.settings.sidebarButtonColor, 0.36));
-  document.documentElement.style.setProperty("--sidebar-tab-bg-hover", hexToRgba(state.settings.sidebarButtonColor, 0.52));
-  document.documentElement.style.setProperty("--sidebar-tab-bg-active", hexToRgba(state.settings.sidebarButtonColor, 0.72));
-  document.documentElement.style.setProperty("--sidebar-tab-border", hexToRgba(state.settings.sidebarButtonColor, 0.35));
-  document.documentElement.style.setProperty("--sidebar-tab-glow", hexToRgba(state.settings.sidebarButtonColor, 0.28));
+  document.body.style.setProperty("--sidebar-tab-bg", sidebarButtonBase);
+  document.body.style.setProperty("--sidebar-tab-bg-hover", sidebarButtonHover);
+  document.body.style.setProperty("--sidebar-tab-bg-active", sidebarButtonActive);
+  document.body.style.setProperty("--sidebar-tab-border", sidebarButtonBorder);
+  document.body.style.setProperty("--sidebar-tab-glow", sidebarButtonGlow);
+  document.body.style.setProperty("--sidebar-tab-width", sidebarButtonWidth);
+  document.body.dataset.sidebarButtonStyle = state.settings.sidebarButtonStyle || "style-1";
   document.documentElement.style.setProperty("--month-toolbar-bg", state.settings.toolbarColor);
   document.documentElement.style.setProperty("--month-toolbar-text", getReadableTextColor(state.settings.toolbarColor));
   const calculatorWidth = clampCalculatorWidth(state.settings.calculatorWidth);
