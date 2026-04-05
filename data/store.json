@@ -39,7 +39,8 @@
     }
   },
   "monthlyIncentives": {
-    "2026-04": {}
+    "2026-04": {},
+    "2026-05": {}
   },
   "monthlyGoals": {
     "2026-04": {
@@ -59,10 +60,10 @@
     "fieldFontSize": 15,
     "panelHeaderSize": 13,
     "densityMode": "compact",
-    "primaryColor": "#b6f23b",
-    "secondaryColor": "#1730a1",
-    "sidebarColor": "#601024",
-    "toolbarColor": "#59d93f",
+    "primaryColor": "#1b61ac",
+    "secondaryColor": "#4a6887",
+    "sidebarColor": "#0648b2",
+    "toolbarColor": "#0a11e6",
     "sidebarTabColors": {
       "relatorios": "#b7f43f",
       "faturacao": "#8fd7ff",
@@ -96,10 +97,10 @@
       "faturacao": "#13214d",
       "movel": "#13214d",
       "meo-energia": "#162550",
-      "objetivo": "#13214d",
+      "objetivo": "#1c3482",
       "geral": "#13214d",
       "tarefas": "#13214d",
-      "apoio": "#13214d",
+      "apoio": "#071541",
       "incentivos": "#133c4e",
       "stock": "#13214d",
       "acessos": "#13214d",
@@ -110,16 +111,16 @@
       "faturacao": "#0f1f56",
       "movel": "#0f1f56",
       "meo-energia": "#1e3a67",
-      "objetivo": "#0f1f56",
+      "objetivo": "#212d54",
       "geral": "#0f1f56",
       "tarefas": "#0f1f56",
-      "apoio": "#0f1f56",
+      "apoio": "#50368c",
       "incentivos": "#54deb0",
       "stock": "#0f1f56",
       "acessos": "#0f1f56",
       "configuracoes": "#0f1f56"
     },
-    "calculatorWidth": 380,
+    "calculatorWidth": 280,
     "formWidth": 580,
     "cardRadius": 24
   }

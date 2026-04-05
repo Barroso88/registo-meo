@@ -2208,7 +2208,7 @@ function applyVisualSettings() {
   document.documentElement.style.setProperty("--accent", state.settings.primaryColor);
   document.documentElement.style.setProperty("--accent-dark", shadeColor(state.settings.primaryColor, -18));
   document.documentElement.style.setProperty("--surface-strong", state.settings.secondaryColor);
-  document.documentElement.style.setProperty("--accent-soft", state.settings.secondaryColor);
+  document.documentElement.style.setProperty("--accent-soft", shadeColor(state.settings.secondaryColor, 14));
   document.documentElement.style.setProperty("--sidebar-bg", state.settings.sidebarColor);
   document.documentElement.style.setProperty("--month-toolbar-bg", state.settings.toolbarColor);
   document.documentElement.style.setProperty("--month-toolbar-text", getReadableTextColor(state.settings.toolbarColor));
