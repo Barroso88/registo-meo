@@ -62,7 +62,7 @@
     "densityMode": "compact",
     "primaryColor": "#1b61ac",
     "secondaryColor": "#4a6887",
-    "sidebarColor": "#0648b2",
+    "sidebarColor": "#010057",
     "toolbarColor": "#101e89",
     "sidebarTabColors": {
       "relatorios": "#b7f43f",
@@ -104,7 +104,7 @@
       "incentivos": "#000361",
       "stock": "#13214d",
       "acessos": "#13214d",
-      "configuracoes": "#13214d"
+      "configuracoes": "#00034d"
     },
     "pageFieldColors": {
       "relatorios": "#0f1f56",
@@ -118,7 +118,7 @@
       "incentivos": "#ebf5f1",
       "stock": "#0f1f56",
       "acessos": "#0f1f56",
-      "configuracoes": "#0f1f56"
+      "configuracoes": "#000000"
     },
     "calculatorWidth": 280,
     "formWidth": 580,

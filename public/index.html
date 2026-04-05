@@ -676,317 +676,332 @@
         </section>
 
         <section class="panel" id="configuracoes">
-          <div class="panel-color-bar">
-            <label class="panel-color-picker">
-              Cor da página
-              <input class="panel-color-input" data-panel-color="configuracoes" type="color" value="#1b2557" />
-            </label>
-            <label class="panel-color-picker">
-              Blocos
-              <input class="panel-block-input" data-panel-block-color="configuracoes" type="color" value="#13214d" />
-            </label>
-            <label class="panel-color-picker">
-              Campos
-              <input class="panel-field-input" data-panel-field-color="configuracoes" type="color" value="#0f1f56" />
-            </label>
-          </div>
-          <div class="table-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="eyebrow">Aspeto</p>
-                <h3>Modo da Aplicação</h3>
+          <div class="table-card settings-archive config-accordion">
+            <details class="config-section">
+              <summary class="config-section-toggle">
+                <span class="config-section-kicker">Página Atual</span>
+                <strong>Cor, Blocos e Campos</strong>
+                <span class="config-section-chevron">+</span>
+              </summary>
+              <div class="config-section-body">
+                <div class="panel-color-bar config-inline-bar">
+                  <label class="panel-color-picker">
+                    Cor da página
+                    <input class="panel-color-input" data-panel-color="configuracoes" type="color" value="#1b2557" />
+                  </label>
+                  <label class="panel-color-picker">
+                    Blocos
+                    <input class="panel-block-input" data-panel-block-color="configuracoes" type="color" value="#13214d" />
+                  </label>
+                  <label class="panel-color-picker">
+                    Campos
+                    <input class="panel-field-input" data-panel-field-color="configuracoes" type="color" value="#0f1f56" />
+                  </label>
+                </div>
               </div>
-            </div>
+            </details>
 
-            <div class="settings-row">
-              <label class="settings-field">
-                Tamanho dos títulos da barra lateral
-                <input type="range" id="menu-font-size" min="12" max="20" step="1" />
-              </label>
+            <details class="config-section">
+              <summary class="config-section-toggle">
+                <span class="config-section-kicker">Aspeto</span>
+                <strong>Modo da Aplicação</strong>
+                <span class="config-section-chevron">+</span>
+              </summary>
+              <div class="config-section-body">
+                <div class="settings-row">
+                  <label class="settings-field">
+                    Tamanho dos títulos da barra lateral
+                    <input type="range" id="menu-font-size" min="12" max="20" step="1" />
+                  </label>
 
-              <label class="settings-field">
-                Tema
-                <select id="theme-selector">
-                  <option value="light">Modo Claro</option>
-                  <option value="dark">Modo Escuro</option>
-                </select>
-              </label>
-            </div>
-
-            <div class="section-heading compact top-spacing">
-              <div>
-                <p class="eyebrow">Editor Visual</p>
-                <h3>Ajustes da Interface</h3>
+                  <label class="settings-field">
+                    Tema
+                    <select id="theme-selector">
+                      <option value="light">Modo Claro</option>
+                      <option value="dark">Modo Escuro</option>
+                    </select>
+                  </label>
+                </div>
               </div>
-            </div>
+            </details>
 
-            <div class="settings-grid">
-              <label class="settings-field">
-                Tamanho dos menus
-                <input type="range" id="menu-font-size" min="12" max="20" step="1" />
-              </label>
+            <details class="config-section">
+              <summary class="config-section-toggle">
+                <span class="config-section-kicker">Editor Visual</span>
+                <strong>Ajustes da Interface</strong>
+                <span class="config-section-chevron">+</span>
+              </summary>
+              <div class="config-section-body">
+                <div class="settings-grid">
+                  <label class="settings-field">
+                    Tamanho dos títulos
+                    <input type="range" id="title-font-size" min="16" max="34" step="1" />
+                  </label>
 
-              <label class="settings-field">
-                Tamanho dos títulos
-                <input type="range" id="title-font-size" min="16" max="34" step="1" />
-              </label>
+                  <label class="settings-field">
+                    Tamanho dos campos
+                    <input type="range" id="field-font-size" min="11" max="18" step="1" />
+                  </label>
 
-              <label class="settings-field">
-                Tamanho dos campos
-                <input type="range" id="field-font-size" min="11" max="18" step="1" />
-              </label>
+                  <label class="settings-field">
+                    Tamanho dos cabeçalhos
+                    <input type="range" id="panel-header-size" min="10" max="24" step="1" />
+                  </label>
 
-              <label class="settings-field">
-                Tamanho dos cabeçalhos
-                <input type="range" id="panel-header-size" min="10" max="24" step="1" />
-              </label>
+                  <label class="settings-field">
+                    Modo de espaçamento
+                    <select id="density-mode">
+                      <option value="compact">Compacto</option>
+                      <option value="normal">Normal</option>
+                    </select>
+                  </label>
 
-              <label class="settings-field">
-                Modo de espaçamento
-                <select id="density-mode">
-                  <option value="compact">Compacto</option>
-                  <option value="normal">Normal</option>
-                </select>
-              </label>
+                  <label class="settings-field">
+                    Cor principal
+                    <input type="color" id="primary-color" value="#b6f23b" />
+                  </label>
 
-              <label class="settings-field">
-                Cor principal
-                <input type="color" id="primary-color" value="#b6f23b" />
-              </label>
+                  <label class="settings-field">
+                    Cor secundária
+                    <input type="color" id="secondary-color" value="#1730a1" />
+                  </label>
 
-              <label class="settings-field">
-                Cor secundária
-                <input type="color" id="secondary-color" value="#1730a1" />
-              </label>
+                  <label class="settings-field">
+                    Cor da barra lateral
+                    <input type="color" id="sidebar-color" value="#102061" />
+                  </label>
 
-              <label class="settings-field">
-                Cor da barra lateral
-                <input type="color" id="sidebar-color" value="#102061" />
-              </label>
+                  <label class="settings-field">
+                    Cor dos botões da barra lateral
+                    <input type="color" id="sidebar-button-color" value="#20316f" />
+                  </label>
 
-              <label class="settings-field">
-                Cor dos botões da barra lateral
-                <input type="color" id="sidebar-button-color" value="#20316f" />
-              </label>
+                  <label class="settings-field">
+                    Estilo dos botões da barra lateral
+                    <select id="sidebar-button-style">
+                      <option value="style-1">Atlas</option>
+                      <option value="style-2">Nova</option>
+                      <option value="style-3">Orbit</option>
+                      <option value="style-4">Slate</option>
+                      <option value="style-5">Ember</option>
+                      <option value="style-6">Midnight</option>
+                      <option value="style-7">Frame</option>
+                      <option value="style-8">Halo</option>
+                      <option value="style-9">Surge</option>
+                      <option value="style-10">Mist</option>
+                    </select>
+                  </label>
 
-              <label class="settings-field">
-                Estilo dos botões da barra lateral
-                <select id="sidebar-button-style">
-                  <option value="style-1">Atlas</option>
-                  <option value="style-2">Nova</option>
-                  <option value="style-3">Orbit</option>
-                  <option value="style-4">Slate</option>
-                  <option value="style-5">Ember</option>
-                  <option value="style-6">Midnight</option>
-                  <option value="style-7">Frame</option>
-                  <option value="style-8">Halo</option>
-                  <option value="style-9">Surge</option>
-                  <option value="style-10">Mist</option>
-                </select>
-              </label>
+                  <label class="settings-field">
+                    Cor da barra do período
+                    <input type="color" id="toolbar-color" value="#b3262d" />
+                  </label>
 
-              <label class="settings-field">
-                Cor da barra do período
-                <input type="color" id="toolbar-color" value="#b3262d" />
-              </label>
+                  <label class="settings-field">
+                    Largura dos formulários
+                    <input type="range" id="form-width" min="520" max="980" step="10" />
+                  </label>
 
-              <label class="settings-field">
-                Largura dos formulários
-                <input type="range" id="form-width" min="520" max="980" step="10" />
-              </label>
-
-              <label class="settings-field">
-                Arredondamento dos cartões
-                <input type="range" id="card-radius" min="12" max="36" step="1" />
-              </label>
-            </div>
-
-            <div class="section-heading compact top-spacing">
-              <div>
-                <p class="eyebrow">Cores por Página</p>
-                <h3>Separadores Individuais</h3>
+                  <label class="settings-field">
+                    Arredondamento dos cartões
+                    <input type="range" id="card-radius" min="12" max="36" step="1" />
+                  </label>
+                </div>
               </div>
-            </div>
+            </details>
 
-            <div class="settings-grid">
-              <label class="settings-field">
-                Relatório
-                <input type="color" id="page-color-relatorios" value="#14226d" />
-              </label>
+            <details class="config-section">
+              <summary class="config-section-toggle">
+                <span class="config-section-kicker">Cores por Página</span>
+                <strong>Separadores Individuais</strong>
+                <span class="config-section-chevron">+</span>
+              </summary>
+              <div class="config-section-body">
+                <div class="settings-grid">
+                  <label class="settings-field">
+                    Relatório
+                    <input type="color" id="page-color-relatorios" value="#14226d" />
+                  </label>
 
-              <label class="settings-field">
-                Faturação
-                <input type="color" id="page-color-faturacao" value="#16286f" />
-              </label>
+                  <label class="settings-field">
+                    Faturação
+                    <input type="color" id="page-color-faturacao" value="#16286f" />
+                  </label>
 
-              <label class="settings-field">
-                Móvel
-                <input type="color" id="page-color-movel" value="#132762" />
-              </label>
+                  <label class="settings-field">
+                    Móvel
+                    <input type="color" id="page-color-movel" value="#132762" />
+                  </label>
 
-              <label class="settings-field">
-                MEO Energia
-                <input type="color" id="page-color-meo-energia" value="#17304f" />
-              </label>
+                  <label class="settings-field">
+                    MEO Energia
+                    <input type="color" id="page-color-meo-energia" value="#17304f" />
+                  </label>
 
-              <label class="settings-field">
-                Objetivo
-                <input type="color" id="page-color-objetivo" value="#18295f" />
-              </label>
+                  <label class="settings-field">
+                    Objetivo
+                    <input type="color" id="page-color-objetivo" value="#18295f" />
+                  </label>
 
-              <label class="settings-field">
-                Geral Mensal
-                <input type="color" id="page-color-geral" value="#11285b" />
-              </label>
+                  <label class="settings-field">
+                    Geral Mensal
+                    <input type="color" id="page-color-geral" value="#11285b" />
+                  </label>
 
-              <label class="settings-field">
-                Tarefas
-                <input type="color" id="page-color-tarefas" value="#14325a" />
-              </label>
+                  <label class="settings-field">
+                    Tarefas
+                    <input type="color" id="page-color-tarefas" value="#14325a" />
+                  </label>
 
-              <label class="settings-field">
-                Apoio
-                <input type="color" id="page-color-apoio" value="#16245b" />
-              </label>
+                  <label class="settings-field">
+                    Apoio
+                    <input type="color" id="page-color-apoio" value="#16245b" />
+                  </label>
 
-              <label class="settings-field">
-                Incentivos
-                <input type="color" id="page-color-incentivos" value="#17265a" />
-              </label>
+                  <label class="settings-field">
+                    Incentivos
+                    <input type="color" id="page-color-incentivos" value="#17265a" />
+                  </label>
 
-              <label class="settings-field">
-                Stock
-                <input type="color" id="page-color-stock" value="#15315b" />
-              </label>
+                  <label class="settings-field">
+                    Stock
+                    <input type="color" id="page-color-stock" value="#15315b" />
+                  </label>
 
-              <label class="settings-field">
-                Acessos
-                <input type="color" id="page-color-acessos" value="#18295f" />
-              </label>
+                  <label class="settings-field">
+                    Acessos
+                    <input type="color" id="page-color-acessos" value="#18295f" />
+                  </label>
 
-              <label class="settings-field">
-                Configurações
-                <input type="color" id="page-color-configuracoes" value="#1b2557" />
-              </label>
-            </div>
-
-            <div class="section-heading compact top-spacing">
-              <div>
-                <p class="eyebrow">Barra Lateral</p>
-                <h3>Cores dos Títulos</h3>
+                  <label class="settings-field">
+                    Configurações
+                    <input type="color" id="page-color-configuracoes" value="#1b2557" />
+                  </label>
+                </div>
               </div>
-            </div>
+            </details>
 
-            <div class="settings-grid">
-              <label class="settings-field sidebar-tab-color-field">
-                Relatório
-                <input type="color" id="sidebar-tab-color-relatorios" data-sidebar-tab-color="relatorios" value="#b7f43f" />
-              </label>
+            <details class="config-section">
+              <summary class="config-section-toggle">
+                <span class="config-section-kicker">Barra Lateral</span>
+                <strong>Cores dos Títulos</strong>
+                <span class="config-section-chevron">+</span>
+              </summary>
+              <div class="config-section-body">
+                <div class="settings-grid">
+                  <label class="settings-field sidebar-tab-color-field">
+                    Relatório
+                    <input type="color" id="sidebar-tab-color-relatorios" data-sidebar-tab-color="relatorios" value="#b7f43f" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Faturação
-                <input type="color" id="sidebar-tab-color-faturacao" data-sidebar-tab-color="faturacao" value="#8fd7ff" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Faturação
+                    <input type="color" id="sidebar-tab-color-faturacao" data-sidebar-tab-color="faturacao" value="#8fd7ff" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Móvel
-                <input type="color" id="sidebar-tab-color-movel" data-sidebar-tab-color="movel" value="#74c7ff" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Móvel
+                    <input type="color" id="sidebar-tab-color-movel" data-sidebar-tab-color="movel" value="#74c7ff" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                MEO Energia
-                <input type="color" id="sidebar-tab-color-meo-energia" data-sidebar-tab-color="meo-energia" value="#9be85b" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    MEO Energia
+                    <input type="color" id="sidebar-tab-color-meo-energia" data-sidebar-tab-color="meo-energia" value="#9be85b" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Objetivo
-                <input type="color" id="sidebar-tab-color-objetivo" data-sidebar-tab-color="objetivo" value="#6fe0b7" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Objetivo
+                    <input type="color" id="sidebar-tab-color-objetivo" data-sidebar-tab-color="objetivo" value="#6fe0b7" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Geral Mensal
-                <input type="color" id="sidebar-tab-color-geral" data-sidebar-tab-color="geral" value="#8ab6ff" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Geral Mensal
+                    <input type="color" id="sidebar-tab-color-geral" data-sidebar-tab-color="geral" value="#8ab6ff" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Tarefas
-                <input type="color" id="sidebar-tab-color-tarefas" data-sidebar-tab-color="tarefas" value="#7fdcc8" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Tarefas
+                    <input type="color" id="sidebar-tab-color-tarefas" data-sidebar-tab-color="tarefas" value="#7fdcc8" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Apoio
-                <input type="color" id="sidebar-tab-color-apoio" data-sidebar-tab-color="apoio" value="#9bd0ff" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Apoio
+                    <input type="color" id="sidebar-tab-color-apoio" data-sidebar-tab-color="apoio" value="#9bd0ff" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Incentivos
-                <input type="color" id="sidebar-tab-color-incentivos" data-sidebar-tab-color="incentivos" value="#ffd166" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Incentivos
+                    <input type="color" id="sidebar-tab-color-incentivos" data-sidebar-tab-color="incentivos" value="#ffd166" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Stock
-                <input type="color" id="sidebar-tab-color-stock" data-sidebar-tab-color="stock" value="#a8ea33" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Stock
+                    <input type="color" id="sidebar-tab-color-stock" data-sidebar-tab-color="stock" value="#a8ea33" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Acessos
-                <input type="color" id="sidebar-tab-color-acessos" data-sidebar-tab-color="acessos" value="#c7b2ff" />
-              </label>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Acessos
+                    <input type="color" id="sidebar-tab-color-acessos" data-sidebar-tab-color="acessos" value="#c7b2ff" />
+                  </label>
 
-              <label class="settings-field sidebar-tab-color-field">
-                Configurações
-                <input type="color" id="sidebar-tab-color-configuracoes" data-sidebar-tab-color="configuracoes" value="#9dc2ff" />
-              </label>
-            </div>
-
-            <div class="section-heading compact top-spacing">
-              <div>
-                <p class="eyebrow">Acesso</p>
-                <h3>Credenciais de Login</h3>
+                  <label class="settings-field sidebar-tab-color-field">
+                    Configurações
+                    <input type="color" id="sidebar-tab-color-configuracoes" data-sidebar-tab-color="configuracoes" value="#9dc2ff" />
+                  </label>
+                </div>
               </div>
-            </div>
+            </details>
 
-            <form class="settings-grid auth-settings-grid" id="auth-settings-form">
-              <p class="settings-message auth-help">
-                Para alterar o acesso, indica a password atual e depois a nova password.
-              </p>
+            <details class="config-section config-section-access">
+              <summary class="config-section-toggle">
+                <span class="config-section-kicker">Acesso</span>
+                <strong>Credenciais de Login</strong>
+                <span class="config-section-chevron">+</span>
+              </summary>
+              <div class="config-section-body">
+                <form class="settings-grid auth-settings-grid" id="auth-settings-form">
+                  <p class="settings-message auth-help">
+                    Para alterar o acesso, indica a password atual e depois a nova password.
+                  </p>
 
-              <label class="settings-field">
-                Utilizador
-                <input type="text" id="auth-username" name="authUsername" autocomplete="username" />
-              </label>
+                  <label class="settings-field">
+                    Utilizador
+                    <input type="text" id="auth-username" name="authUsername" autocomplete="username" />
+                  </label>
 
-              <label class="settings-field">
-                Password atual
-                <input
-                  type="password"
-                  id="auth-current-password"
-                  name="authCurrentPassword"
-                  autocomplete="current-password"
-                />
-              </label>
+                  <label class="settings-field">
+                    Password atual
+                    <input
+                      type="password"
+                      id="auth-current-password"
+                      name="authCurrentPassword"
+                      autocomplete="current-password"
+                    />
+                  </label>
 
-              <label class="settings-field">
-                Nova password
-                <input type="password" id="auth-password" name="authPassword" autocomplete="new-password" />
-              </label>
+                  <label class="settings-field">
+                    Nova password
+                    <input type="password" id="auth-password" name="authPassword" autocomplete="new-password" />
+                  </label>
 
-              <label class="settings-field">
-                Confirmar password
-                <input
-                  type="password"
-                  id="auth-password-confirm"
-                  name="authPasswordConfirm"
-                  autocomplete="new-password"
-                />
-              </label>
+                  <label class="settings-field">
+                    Confirmar password
+                    <input
+                      type="password"
+                      id="auth-password-confirm"
+                      name="authPasswordConfirm"
+                      autocomplete="new-password"
+                    />
+                  </label>
 
-              <div class="settings-actions">
-                <p class="settings-message">Se deixares a password em branco, a atual mantém-se.</p>
-                <button type="submit" class="primary-button">Guardar credenciais</button>
-                <p class="settings-message" id="auth-settings-message" aria-live="polite"></p>
+                  <div class="settings-actions">
+                    <p class="settings-message">Se deixares a password em branco, a atual mantém-se.</p>
+                    <button type="submit" class="primary-button">Guardar credenciais</button>
+                    <p class="settings-message" id="auth-settings-message" aria-live="polite"></p>
+                  </div>
+                </form>
               </div>
-            </form>
+            </details>
           </div>
         </section>
 

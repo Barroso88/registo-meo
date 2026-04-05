@@ -1178,6 +1178,7 @@ async function initialize() {
   hydrateAuthSettings();
   applyTheme();
   applyVisualSettings();
+  initializeConfigAccordion();
   renderAll();
 }
 
@@ -2506,6 +2507,27 @@ function hydratePanelFieldPickers() {
     if (!panelId) return;
     input.value = state.settings.pageFieldColors?.[panelId] || DEFAULT_PAGE_FIELD_COLORS[panelId];
   });
+}
+
+let configAccordionInitialized = false;
+
+function initializeConfigAccordion() {
+  if (configAccordionInitialized) return;
+
+  const sections = Array.from(document.querySelectorAll("#configuracoes .config-section"));
+  if (!sections.length) return;
+
+  sections.forEach((section) => {
+    section.addEventListener("toggle", () => {
+      if (!section.open) return;
+
+      sections.forEach((otherSection) => {
+        if (otherSection !== section) otherSection.open = false;
+      });
+    });
+  });
+
+  configAccordionInitialized = true;
 }
 
 async function handleVisualSettingsChange() {
