@@ -134,11 +134,11 @@
             </label>
           </div>
           <div class="stats-grid">
-            <article class="stat-card">
+            <article class="stat-card billing-card billing-card-total">
               <span>Total de vendas</span>
               <strong id="total-sales">0</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card billing-card billing-card-amount">
               <span>Valor acumulado</span>
               <strong id="total-amount">0,00 €</strong>
             </article>
@@ -284,7 +284,7 @@
             <button type="submit" class="primary-button">Guardar registo</button>
           </form>
 
-          <div class="table-card">
+          <div class="table-card billing-table-card">
             <div class="section-heading compact">
               <div>
                 <p class="eyebrow">Lista</p>
@@ -296,23 +296,46 @@
               <table class="billing-table">
                 <thead>
                   <tr>
-                    <th>Data</th>
+                    <th class="billing-filter-th">
+                      <button class="billing-filter-trigger" type="button" data-billing-filter-trigger="data">
+                        <span class="billing-filter-arrow">▾</span>
+                        <span>Data</span>
+                      </button>
+                      <div class="billing-filter-menu" data-billing-filter-menu="data" aria-hidden="true"></div>
+                    </th>
                     <th>NIF</th>
                     <th class="billing-equipment-column">Equipamento</th>
                     <th>S/ IVA</th>
-                    <th>Seguro</th>
-                    <th>Seguro Mensal</th>
-                    <th>Categoria</th>
+                    <th class="billing-filter-th">
+                      <button class="billing-filter-trigger" type="button" data-billing-filter-trigger="seguro">
+                        <span class="billing-filter-arrow">▾</span>
+                        <span>Seguro</span>
+                      </button>
+                      <div class="billing-filter-menu" data-billing-filter-menu="seguro" aria-hidden="true"></div>
+                    </th>
+                    <th class="billing-filter-th">
+                      <button class="billing-filter-trigger" type="button" data-billing-filter-trigger="categoria">
+                        <span class="billing-filter-arrow">▾</span>
+                        <span>Categoria</span>
+                      </button>
+                      <div class="billing-filter-menu" data-billing-filter-menu="categoria" aria-hidden="true"></div>
+                    </th>
                     <th>IMEI/SN</th>
                     <th>Nº Fatura</th>
-                    <th>Modalidade</th>
+                    <th class="billing-filter-th">
+                      <button class="billing-filter-trigger" type="button" data-billing-filter-trigger="modalidade">
+                        <span class="billing-filter-arrow">▾</span>
+                        <span>Modalidade</span>
+                      </button>
+                      <div class="billing-filter-menu" data-billing-filter-menu="modalidade" aria-hidden="true"></div>
+                    </th>
                     <th>Notas</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
                 <tbody id="sales-table-body">
                   <tr class="empty-row">
-                    <td colspan="12">Ainda não existem registos de faturação.</td>
+                    <td colspan="11">Ainda não existem registos de faturação.</td>
                   </tr>
                 </tbody>
               </table>
@@ -374,7 +397,7 @@
             </label>
 
             <label>
-              ID Venda
+              ID
               <input type="text" name="idVenda" placeholder="Identificador da venda" />
             </label>
 
@@ -446,27 +469,68 @@
             </div>
 
             <div class="table-wrap">
-              <table>
+              <table class="mobile-table">
                 <thead>
                   <tr>
-                    <th>Data</th>
+                    <th class="mobile-filter-th">
+                      <button class="mobile-filter-trigger" type="button" data-mobile-filter-trigger="data">
+                        <span class="mobile-filter-arrow">▾</span>
+                        <span>Data</span>
+                      </button>
+                      <div class="mobile-filter-menu" data-mobile-filter-menu="data" aria-hidden="true"></div>
+                    </th>
                     <th>Nome</th>
                     <th>NIF</th>
                     <th>Número</th>
-                    <th>Tarifário</th>
-                    <th>ID Venda</th>
-                    <th>Fidelização</th>
-                    <th>Portabilidade</th>
-                    <th>Best Offer</th>
-                    <th>Net Segura</th>
-                    <th>RCE Aceite</th>
-                    <th>Forma de Aceitação</th>
+                    <th class="mobile-filter-th">
+                      <button class="mobile-filter-trigger" type="button" data-mobile-filter-trigger="tarifario">
+                        <span class="mobile-filter-arrow">▾</span>
+                        <span>Tarifário</span>
+                      </button>
+                      <div class="mobile-filter-menu" data-mobile-filter-menu="tarifario" aria-hidden="true"></div>
+                    </th>
+                    <th>ID</th>
+                    <th class="mobile-filter-th">
+                      <button class="mobile-filter-trigger" type="button" data-mobile-filter-trigger="fidelizacao">
+                        <span class="mobile-filter-arrow">▾</span>
+                        <span>FID</span>
+                      </button>
+                      <div class="mobile-filter-menu" data-mobile-filter-menu="fidelizacao" aria-hidden="true"></div>
+                    </th>
+                    <th class="mobile-filter-th">
+                      <button class="mobile-filter-trigger" type="button" data-mobile-filter-trigger="portabilidade">
+                        <span class="mobile-filter-arrow">▾</span>
+                        <span>PORT</span>
+                      </button>
+                      <div class="mobile-filter-menu" data-mobile-filter-menu="portabilidade" aria-hidden="true"></div>
+                    </th>
+                    <th class="mobile-filter-th">
+                      <button class="mobile-filter-trigger" type="button" data-mobile-filter-trigger="bestOffer">
+                        <span class="mobile-filter-arrow">▾</span>
+                        <span>NBO</span>
+                      </button>
+                      <div class="mobile-filter-menu" data-mobile-filter-menu="bestOffer" aria-hidden="true"></div>
+                    </th>
+                    <th class="mobile-filter-th">
+                      <button class="mobile-filter-trigger" type="button" data-mobile-filter-trigger="netSegura">
+                        <span class="mobile-filter-arrow">▾</span>
+                        <span>Segura</span>
+                      </button>
+                      <div class="mobile-filter-menu" data-mobile-filter-menu="netSegura" aria-hidden="true"></div>
+                    </th>
+                    <th class="mobile-filter-th">
+                      <button class="mobile-filter-trigger" type="button" data-mobile-filter-trigger="rceAceite">
+                        <span class="mobile-filter-arrow">▾</span>
+                        <span>RCE</span>
+                      </button>
+                      <div class="mobile-filter-menu" data-mobile-filter-menu="rceAceite" aria-hidden="true"></div>
+                    </th>
                     <th>Ações</th>
                   </tr>
                 </thead>
                 <tbody id="mobile-table-body">
                   <tr class="empty-row">
-                    <td colspan="13">Ainda não existem registos móveis.</td>
+                    <td colspan="12">Ainda não existem registos móveis.</td>
                   </tr>
                 </tbody>
               </table>
@@ -618,33 +682,33 @@
             </label>
           </div>
           <div class="stats-grid report-stats" id="report-summary-cards">
-            <article class="stat-card">
+            <article class="stat-card report-card report-card-billing">
               <span>Faturação S/ IVA</span>
               <strong id="report-total-net">0,00 €</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card report-card report-card-smartphone">
               <span>Qtd. Smartphone</span>
               <strong id="report-total-smartphone">0</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card report-card report-card-diversity">
               <span>Qtd. Diversidade</span>
               <strong id="report-total-diversidade">0</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card report-card report-card-insurance">
               <span>Qtd. Seguros</span>
               <strong id="report-total-seguros">0</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card report-card report-card-mobile">
               <span>Qtd. Móvel</span>
               <strong id="report-total-movel">0</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card report-card report-card-energy">
               <span>Qtd. MEO Energia</span>
               <strong id="report-total-energia">0</strong>
             </article>
           </div>
 
-          <div class="table-card">
+          <div class="table-card report-card">
             <div class="section-heading compact">
               <div>
                 <p class="eyebrow">Resumo por Dia</p>
@@ -653,10 +717,16 @@
             </div>
 
             <div class="table-wrap">
-              <table>
+              <table class="report-table">
                 <thead>
                   <tr>
-                    <th>Data</th>
+                    <th class="report-filter-th">
+                      <button class="report-filter-trigger" type="button" data-report-filter-trigger="data">
+                        <span class="report-filter-arrow">▾</span>
+                        <span>Data</span>
+                      </button>
+                      <div class="report-filter-menu" data-report-filter-menu="data" aria-hidden="true"></div>
+                    </th>
                     <th>Faturação S/ IVA</th>
                     <th>Qtd. Smartphone</th>
                     <th>Qtd. Diversidade</th>
@@ -891,62 +961,62 @@
                 <div class="settings-grid">
                   <label class="settings-field sidebar-tab-color-field">
                     Relatório
-                    <input type="color" id="sidebar-tab-color-relatorios" data-sidebar-tab-color="relatorios" value="#b7f43f" />
+                    <input type="color" id="sidebar-tab-color-relatorios" data-sidebar-tab-color="relatorios" value="#c9ff4f" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Faturação
-                    <input type="color" id="sidebar-tab-color-faturacao" data-sidebar-tab-color="faturacao" value="#8fd7ff" />
+                    <input type="color" id="sidebar-tab-color-faturacao" data-sidebar-tab-color="faturacao" value="#5ed0ff" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Móvel
-                    <input type="color" id="sidebar-tab-color-movel" data-sidebar-tab-color="movel" value="#74c7ff" />
+                    <input type="color" id="sidebar-tab-color-movel" data-sidebar-tab-color="movel" value="#7c9dff" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     MEO Energia
-                    <input type="color" id="sidebar-tab-color-meo-energia" data-sidebar-tab-color="meo-energia" value="#9be85b" />
+                    <input type="color" id="sidebar-tab-color-meo-energia" data-sidebar-tab-color="meo-energia" value="#9bff72" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Objetivo
-                    <input type="color" id="sidebar-tab-color-objetivo" data-sidebar-tab-color="objetivo" value="#6fe0b7" />
+                    <input type="color" id="sidebar-tab-color-objetivo" data-sidebar-tab-color="objetivo" value="#52f0c5" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Geral Mensal
-                    <input type="color" id="sidebar-tab-color-geral" data-sidebar-tab-color="geral" value="#8ab6ff" />
+                    <input type="color" id="sidebar-tab-color-geral" data-sidebar-tab-color="geral" value="#6fb8ff" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Tarefas
-                    <input type="color" id="sidebar-tab-color-tarefas" data-sidebar-tab-color="tarefas" value="#7fdcc8" />
+                    <input type="color" id="sidebar-tab-color-tarefas" data-sidebar-tab-color="tarefas" value="#7dffd8" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Apoio
-                    <input type="color" id="sidebar-tab-color-apoio" data-sidebar-tab-color="apoio" value="#9bd0ff" />
+                    <input type="color" id="sidebar-tab-color-apoio" data-sidebar-tab-color="apoio" value="#7bd4ff" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Incentivos
-                    <input type="color" id="sidebar-tab-color-incentivos" data-sidebar-tab-color="incentivos" value="#ffd166" />
+                    <input type="color" id="sidebar-tab-color-incentivos" data-sidebar-tab-color="incentivos" value="#ffd05a" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Stock
-                    <input type="color" id="sidebar-tab-color-stock" data-sidebar-tab-color="stock" value="#a8ea33" />
+                    <input type="color" id="sidebar-tab-color-stock" data-sidebar-tab-color="stock" value="#a7ff4f" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Acessos
-                    <input type="color" id="sidebar-tab-color-acessos" data-sidebar-tab-color="acessos" value="#c7b2ff" />
+                    <input type="color" id="sidebar-tab-color-acessos" data-sidebar-tab-color="acessos" value="#cf9cff" />
                   </label>
 
                   <label class="settings-field sidebar-tab-color-field">
                     Configurações
-                    <input type="color" id="sidebar-tab-color-configuracoes" data-sidebar-tab-color="configuracoes" value="#9dc2ff" />
+                    <input type="color" id="sidebar-tab-color-configuracoes" data-sidebar-tab-color="configuracoes" value="#ff8ed1" />
                   </label>
                 </div>
               </div>
@@ -1021,33 +1091,33 @@
             </label>
           </div>
           <div class="stats-grid report-stats">
-            <article class="stat-card">
+            <article class="stat-card objective-card objective-card-total">
               <span>Objetivo Global Atingido</span>
               <strong id="goal-total-progress">0%</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card objective-card objective-card-billing">
               <span>Faturação</span>
               <strong id="goal-billing-progress">0%</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card objective-card objective-card-mobile">
               <span>Móvel</span>
               <strong id="goal-mobile-progress">0%</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card objective-card objective-card-energy">
               <span>MEO Energia</span>
               <strong id="goal-energy-progress">0%</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card objective-card objective-card-insurance">
               <span>Seguros</span>
               <strong id="goal-insurance-progress">0%</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card objective-card objective-card-diversity">
               <span>Diversidade</span>
               <strong id="goal-diversity-progress">0%</strong>
             </article>
           </div>
 
-          <form class="sales-form" id="goals-form">
+          <form class="sales-form goals-form" id="goals-form">
             <label>
               Objetivo Faturação S/ IVA
               <input
@@ -1093,13 +1163,14 @@
             </div>
 
             <div class="table-wrap">
-              <table>
+              <table class="goal-comparison-table">
                 <thead>
                   <tr>
                     <th>Categoria</th>
                     <th>Real do Mês</th>
                     <th>Objetivo</th>
                     <th>% Atingido</th>
+                    <th>Em Falta</th>
                     <th>Peso</th>
                     <th>Contributo</th>
                   </tr>
@@ -1110,6 +1181,7 @@
                     <td id="goal-actual-billing">0,00 €</td>
                     <td id="goal-target-billing">0,00 €</td>
                     <td id="goal-percent-billing">0%</td>
+                    <td id="goal-missing-billing">0,00 €</td>
                     <td>50%</td>
                     <td id="goal-weighted-billing">0%</td>
                   </tr>
@@ -1118,6 +1190,7 @@
                     <td id="goal-actual-mobile">0</td>
                     <td id="goal-target-mobile">0</td>
                     <td id="goal-percent-mobile">0%</td>
+                    <td id="goal-missing-mobile">0</td>
                     <td>30%</td>
                     <td id="goal-weighted-mobile">0%</td>
                   </tr>
@@ -1126,6 +1199,7 @@
                     <td id="goal-actual-energy">0</td>
                     <td id="goal-target-energy">0</td>
                     <td id="goal-percent-energy">0%</td>
+                    <td id="goal-missing-energy">0</td>
                     <td>20%</td>
                     <td id="goal-weighted-energy">0%</td>
                   </tr>
@@ -1134,6 +1208,7 @@
                     <td id="goal-actual-insurance">0%</td>
                     <td id="goal-target-insurance">15%</td>
                     <td id="goal-percent-insurance">0%</td>
+                    <td id="goal-missing-insurance">0%</td>
                     <td>Indicador</td>
                     <td id="goal-weighted-insurance">0 / 0</td>
                   </tr>
@@ -1142,6 +1217,7 @@
                     <td id="goal-actual-diversity">0%</td>
                     <td id="goal-target-diversity">160%</td>
                     <td id="goal-percent-diversity">0%</td>
+                    <td id="goal-missing-diversity">0%</td>
                     <td>Indicador</td>
                     <td id="goal-weighted-diversity">0 / 0</td>
                   </tr>
@@ -1175,7 +1251,7 @@
             </div>
 
             <div class="table-wrap">
-              <table>
+              <table class="general-table">
                 <thead>
                   <tr>
                     <th>Mês</th>
@@ -1213,15 +1289,15 @@
             </label>
           </div>
           <div class="stats-grid report-stats">
-            <article class="stat-card">
+            <article class="stat-card task-card task-card-total">
               <span>Total de tarefas</span>
               <strong id="tasks-total-count">0</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card task-card task-card-open">
               <span>Por concluir</span>
               <strong id="tasks-open-count">0</strong>
             </article>
-            <article class="stat-card">
+            <article class="stat-card task-card task-card-done">
               <span>Concluídas</span>
               <strong id="tasks-done-count">0</strong>
             </article>

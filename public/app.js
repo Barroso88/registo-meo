@@ -107,18 +107,18 @@ const ACCESS_SERVICES = [
 ];
 
 const DEFAULT_SIDEBAR_TAB_COLORS = {
-  relatorios: "#b7f43f",
-  faturacao: "#8fd7ff",
-  movel: "#74c7ff",
-  "meo-energia": "#9be85b",
-  objetivo: "#6fe0b7",
-  geral: "#8ab6ff",
-  tarefas: "#7fdcc8",
-  apoio: "#9bd0ff",
-  incentivos: "#ffd166",
-  stock: "#a8ea33",
-  acessos: "#c7b2ff",
-  configuracoes: "#9dc2ff",
+  relatorios: "#f8d84c",
+  faturacao: "#4fd3ff",
+  movel: "#ff6a9a",
+  "meo-energia": "#77f25f",
+  objetivo: "#7c7cff",
+  geral: "#7fe0ff",
+  tarefas: "#5ef0b2",
+  apoio: "#ff9f43",
+  incentivos: "#d68bff",
+  stock: "#a3ff5c",
+  acessos: "#ff7d7d",
+  configuracoes: "#f77dd6",
 };
 
 const DEFAULT_PAGE_BLOCK_COLORS = {
@@ -190,22 +190,27 @@ const goalDiversityProgress = document.getElementById("goal-diversity-progress")
 const goalActualBilling = document.getElementById("goal-actual-billing");
 const goalTargetBilling = document.getElementById("goal-target-billing");
 const goalPercentBilling = document.getElementById("goal-percent-billing");
+const goalMissingBilling = document.getElementById("goal-missing-billing");
 const goalWeightedBilling = document.getElementById("goal-weighted-billing");
 const goalActualMobile = document.getElementById("goal-actual-mobile");
 const goalTargetMobile = document.getElementById("goal-target-mobile");
 const goalPercentMobile = document.getElementById("goal-percent-mobile");
+const goalMissingMobile = document.getElementById("goal-missing-mobile");
 const goalWeightedMobile = document.getElementById("goal-weighted-mobile");
 const goalActualEnergy = document.getElementById("goal-actual-energy");
 const goalTargetEnergy = document.getElementById("goal-target-energy");
 const goalPercentEnergy = document.getElementById("goal-percent-energy");
+const goalMissingEnergy = document.getElementById("goal-missing-energy");
 const goalWeightedEnergy = document.getElementById("goal-weighted-energy");
 const goalActualInsurance = document.getElementById("goal-actual-insurance");
 const goalTargetInsurance = document.getElementById("goal-target-insurance");
 const goalPercentInsurance = document.getElementById("goal-percent-insurance");
+const goalMissingInsurance = document.getElementById("goal-missing-insurance");
 const goalWeightedInsurance = document.getElementById("goal-weighted-insurance");
 const goalActualDiversity = document.getElementById("goal-actual-diversity");
 const goalTargetDiversity = document.getElementById("goal-target-diversity");
 const goalPercentDiversity = document.getElementById("goal-percent-diversity");
+const goalMissingDiversity = document.getElementById("goal-missing-diversity");
 const goalWeightedDiversity = document.getElementById("goal-weighted-diversity");
 const tasksTotalCount = document.getElementById("tasks-total-count");
 const tasksOpenCount = document.getElementById("tasks-open-count");
@@ -440,7 +445,24 @@ const state = {
   },
 };
 
+const BILLING_FILTER_FIELDS = {
+  data: {
+    label: "Data",
+  },
+  seguro: {
+    label: "Seguro",
+  },
+  categoria: {
+    label: "Categoria",
+  },
+  modalidade: {
+    label: "Modalidade",
+  },
+};
+
 let editingBillingIndex = null;
+let billingInlineEditingIndex = null;
+let mobileInlineEditingIndex = null;
 let editingMobileIndex = null;
 let editingEnergyIndex = null;
 let editingTaskIndex = null;
@@ -460,6 +482,131 @@ let sidebarSearchState = {
   index: -1,
   activeKey: "",
 };
+let reportDateFilter = "";
+let reportDateFilterOpen = false;
+let billingFilters = {
+  data: "",
+  seguro: "",
+  categoria: "",
+  modalidade: "",
+};
+let billingFilterOpenKey = "";
+let mobileFilters = {
+  data: "",
+  tarifario: "",
+  fidelizacao: "",
+  portabilidade: "",
+  bestOffer: "",
+  netSegura: "",
+  rceAceite: "",
+};
+let mobileFilterOpenKey = "";
+
+function getSelectedMonthBillingSales() {
+  return state.billingSales
+    .filter((sale) => isInSelectedMonth(sale.data))
+    .sort((a, b) => compareSaleDates(a.data, b.data));
+}
+
+function getReportSummaryDates() {
+  const dates = new Set();
+
+  state.billingSales.forEach((sale) => {
+    if (isInSelectedMonth(sale.data) && sale.data) dates.add(sale.data);
+  });
+  state.mobileSales.forEach((sale) => {
+    if (isInSelectedMonth(sale.data) && sale.data) dates.add(sale.data);
+  });
+  state.energySales.forEach((sale) => {
+    if (isInSelectedMonth(sale.data) && sale.data) dates.add(sale.data);
+  });
+
+  return [...dates].sort();
+}
+
+function renderReportDateMenu(dates) {
+  const menu = document.querySelector('[data-report-filter-menu="data"]');
+  const trigger = document.querySelector('[data-report-filter-trigger="data"]');
+  if (!(menu instanceof HTMLElement) || !(trigger instanceof HTMLElement)) return;
+
+  trigger.classList.toggle("is-filtered", Boolean(reportDateFilter));
+  trigger.setAttribute("aria-expanded", reportDateFilterOpen ? "true" : "false");
+
+  const options = [
+    `
+      <button type="button" class="report-filter-option ${reportDateFilter === "" ? "active" : ""}" data-report-filter-choice="">
+        Todos
+      </button>
+    `,
+    ...(dates.length > 0
+      ? dates.map(
+          (value) => `
+            <button type="button" class="report-filter-option ${reportDateFilter === value ? "active" : ""}" data-report-filter-choice="${escapeHtml(value)}">
+              ${escapeHtml(formatDate(value))}
+            </button>
+          `
+        )
+      : [`<div class="report-filter-empty">Sem datas</div>`]),
+  ];
+
+  menu.innerHTML = options.join("");
+  menu.classList.toggle("open", reportDateFilterOpen);
+  menu.setAttribute("aria-hidden", reportDateFilterOpen ? "false" : "true");
+
+  if (reportDateFilterOpen) {
+    positionBillingFilterMenu(menu, trigger);
+  } else {
+    menu.style.left = "";
+    menu.style.top = "";
+    menu.style.transform = "";
+    menu.style.maxHeight = "";
+    menu.style.position = "";
+    menu.style.zIndex = "";
+  }
+}
+
+function refreshReportDateMenu() {
+  renderReportDateMenu(getReportSummaryDates());
+}
+
+function toggleReportDateMenu() {
+  reportDateFilterOpen = reportDateFilterOpen ? false : true;
+  refreshReportDateMenu();
+}
+
+function closeReportDateMenu() {
+  if (!reportDateFilterOpen) return;
+  reportDateFilterOpen = false;
+  refreshReportDateMenu();
+}
+
+function positionBillingFilterMenu(menu, trigger) {
+  const rect = trigger.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const menuWidth = Math.min(Math.max(menu.offsetWidth || 176, 176), viewportWidth - 16);
+  const anchorX = rect.left + rect.width / 2;
+  const left = Math.min(Math.max(anchorX, menuWidth / 2 + 8), viewportWidth - menuWidth / 2 - 8);
+  const spaceBelow = viewportHeight - rect.bottom;
+  const spaceAbove = rect.top;
+  const openUp = spaceBelow < 260 && spaceAbove > spaceBelow;
+  const top = openUp ? rect.top - 8 : rect.bottom + 8;
+  const maxHeight = Math.max(160, Math.min(280, openUp ? spaceAbove - 16 : spaceBelow - 16));
+
+  if (menu.parentElement !== document.body) {
+    document.body.appendChild(menu);
+  }
+  menu.style.position = "fixed";
+  menu.style.left = `${left}px`;
+  menu.style.top = `${top}px`;
+  menu.style.maxHeight = `${maxHeight}px`;
+  menu.style.transform = openUp ? "translate(-50%, -100%)" : "translate(-50%, 0)";
+  menu.style.zIndex = "9999";
+}
+
+function refreshBillingFilterMenus() {
+  renderBillingFilterMenus(getSelectedMonthBillingSales());
+}
 
 function clampCalculatorWidth(value) {
   return Math.min(460, Math.max(280, Number(value) || 360));
@@ -607,6 +754,94 @@ document.addEventListener("click", (event) => {
     evaluateCalculator();
   }
 });
+
+document.addEventListener("click", (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+
+  const reportFilterTrigger = target.closest("[data-report-filter-trigger]");
+  if (reportFilterTrigger instanceof HTMLElement) {
+    event.preventDefault();
+    toggleReportDateMenu();
+    return;
+  }
+
+  const reportFilterChoice = target.closest("[data-report-filter-choice]");
+  if (reportFilterChoice instanceof HTMLElement) {
+    reportDateFilter = reportFilterChoice.dataset.reportFilterChoice || "";
+    reportDateFilterOpen = false;
+    refreshReportDateMenu();
+    renderReport();
+    return;
+  }
+
+  if (!target.closest(".report-filter-th")) {
+    closeReportDateMenu();
+  }
+
+  const mobileFilterTrigger = target.closest("[data-mobile-filter-trigger]");
+  if (mobileFilterTrigger instanceof HTMLElement) {
+    event.preventDefault();
+    toggleMobileFilterMenu(mobileFilterTrigger.dataset.mobileFilterTrigger || "");
+    return;
+  }
+
+  const mobileFilterChoice = target.closest("[data-mobile-filter-choice]");
+  if (mobileFilterChoice instanceof HTMLElement) {
+    const field = mobileFilterChoice.dataset.mobileFilterChoice || "";
+    const value = mobileFilterChoice.dataset.mobileFilterValue || "";
+    if (field in mobileFilters) {
+      mobileFilters = {
+        ...mobileFilters,
+        [field]: value,
+      };
+    }
+    closeMobileFilterMenu();
+    renderMobileSales();
+    return;
+  }
+
+  if (!target.closest(".mobile-filter-th")) {
+    closeMobileFilterMenu();
+  }
+
+  const filterTrigger = target.closest("[data-billing-filter-trigger]");
+  if (filterTrigger instanceof HTMLElement) {
+    event.preventDefault();
+    toggleBillingFilterMenu(filterTrigger.dataset.billingFilterTrigger || "");
+    return;
+  }
+
+  const filterChoice = target.closest("[data-billing-filter-choice]");
+  if (filterChoice instanceof HTMLElement) {
+    const field = filterChoice.dataset.billingFilterValue || "";
+    const value = filterChoice.dataset.billingFilterChoice || "";
+    setBillingFilter(field, value);
+    closeBillingFilterMenu();
+    renderBillingSales();
+    return;
+  }
+
+  if (!target.closest(".billing-filter-th")) {
+    closeBillingFilterMenu();
+  }
+});
+
+window.addEventListener("resize", () => {
+  if (billingFilterOpenKey) {
+    refreshBillingFilterMenus();
+  }
+});
+
+window.addEventListener(
+  "scroll",
+  () => {
+    if (billingFilterOpenKey) {
+      refreshBillingFilterMenus();
+    }
+  },
+  true
+);
 
 document.addEventListener("keydown", (event) => {
   if (!isCalculatorKeyboardActive()) return;
@@ -781,6 +1016,9 @@ monthSelector.addEventListener("input", () => {
   selectedMonth = monthSelector.value || getCurrentMonth();
   updateMonthLabel();
   syncFormDatesToMonth();
+  closeBillingFilterMenu();
+  closeReportDateMenu();
+  closeMobileFilterMenu();
   renderAll();
 });
 
@@ -1010,9 +1248,23 @@ billingTableBody.addEventListener("click", async (event) => {
     editBillingSale(Number(target.dataset.editBilling));
   }
 
+  if (target.dataset.cancelBillingInline !== undefined) {
+    cancelBillingInlineEdit(Number(target.dataset.cancelBillingInline));
+  }
+
   if (target.dataset.deleteBilling !== undefined) {
     deleteBillingSale(Number(target.dataset.deleteBilling));
     await persistAndRender();
+  }
+});
+
+billingTableBody.addEventListener("submit", async (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLFormElement)) return;
+
+  if (target.matches("[data-billing-inline-form]")) {
+    event.preventDefault();
+    await saveBillingInlineEdit(target);
   }
 });
 
@@ -1024,9 +1276,23 @@ mobileTableBody.addEventListener("click", async (event) => {
     editMobileSale(Number(target.dataset.editMobile));
   }
 
+  if (target.dataset.cancelMobileInline !== undefined) {
+    cancelMobileInlineEdit(Number(target.dataset.cancelMobileInline));
+  }
+
   if (target.dataset.deleteMobile !== undefined) {
     deleteMobileSale(Number(target.dataset.deleteMobile));
     await persistAndRender();
+  }
+});
+
+mobileTableBody.addEventListener("submit", async (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLFormElement)) return;
+
+  if (target.matches("[data-mobile-inline-form]")) {
+    event.preventDefault();
+    await saveMobileInlineEdit(target);
   }
 });
 
@@ -1280,54 +1546,361 @@ function isCalculatorKeyboardActive() {
 }
 
 function renderBillingSales() {
-  const visibleSales = state.billingSales.filter((sale) => isInSelectedMonth(sale.data));
+  const monthSales = getSelectedMonthBillingSales();
+  renderBillingFilterMenus(monthSales);
+
+  const visibleSales = monthSales.filter((sale) => {
+    if (billingFilters.data && sale.data !== billingFilters.data) return false;
+    if (billingFilters.seguro && (sale.seguro || "") !== billingFilters.seguro) return false;
+    if (billingFilters.categoria && (sale.categoria || "") !== billingFilters.categoria) return false;
+    if (billingFilters.modalidade && (sale.modalidade || "") !== billingFilters.modalidade) return false;
+    return true;
+  });
 
   if (visibleSales.length === 0) {
-    billingTableBody.innerHTML = emptyRow(14, "Ainda não existem registos de faturação.");
+    billingTableBody.innerHTML = emptyRow(11, "Ainda não existem registos de faturação.");
   } else {
     billingTableBody.innerHTML = visibleSales
-      .map(
-        (sale) => `
-          <tr>
+      .map((sale) => {
+        const billingIndex = state.billingSales.indexOf(sale);
+        const isInlineEditing = billingInlineEditingIndex === billingIndex;
+
+        return `
+          <tr class="${isInlineEditing ? "billing-inline-active" : ""}">
             <td>${formatDate(sale.data)}</td>
             <td>${escapeHtml(sale.nif || "")}</td>
             <td>${escapeHtml(sale.equipamento || "")}</td>
             <td>${formatCurrency(Number(sale.valorSemIva || 0))}</td>
             <td>${escapeHtml(sale.seguro || "")}</td>
-            <td>${formatCurrency(Number(sale.valorSeguro || 0))}</td>
             <td>${escapeHtml(sale.categoria || "")}</td>
             <td>${escapeHtml(sale.imei || "")}</td>
             <td>${escapeHtml(sale.fatura || "")}</td>
             <td>${escapeHtml(sale.modalidade || "")}</td>
             <td>${escapeHtml(sale.notas || "")}</td>
             <td class="actions-cell">
-              <button type="button" class="table-action" data-edit-billing="${state.billingSales.indexOf(sale)}">Editar</button>
-              <button type="button" class="table-action delete" data-delete-billing="${state.billingSales.indexOf(sale)}">Eliminar</button>
+              <button type="button" class="table-action icon edit" data-edit-billing="${billingIndex}" aria-label="Editar" title="Editar">
+                <span class="billing-action-icon billing-action-icon-edit" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="table-action icon delete" data-delete-billing="${billingIndex}" aria-label="Eliminar" title="Eliminar">
+                <span class="billing-action-icon billing-action-icon-delete" aria-hidden="true"></span>
+              </button>
             </td>
           </tr>
-        `
-      )
+          ${
+            isInlineEditing
+              ? `
+                <tr class="billing-inline-editor-row">
+                  <td colspan="11">
+                    <form class="billing-inline-form" data-billing-inline-form="${billingIndex}">
+                      <div class="billing-inline-grid">
+                        <label>
+                          <span>Data</span>
+                          <input type="date" name="data" value="${escapeHtml(sale.data || "")}" />
+                        </label>
+                        <label>
+                          <span>NIF</span>
+                          <input type="text" name="nif" value="${escapeHtml(sale.nif || "")}" />
+                        </label>
+                        <label>
+                          <span>Equipamento</span>
+                          <input type="text" name="equipamento" value="${escapeHtml(sale.equipamento || "")}" />
+                        </label>
+                        <label>
+                          <span>Valor em €</span>
+                          <input type="text" name="valor" inputmode="decimal" value="${escapeHtml(formatMoneyInputValue(Number(sale.valor || 0)))}" />
+                        </label>
+                        <label>
+                          <span>Seguro</span>
+                          <select name="seguro">
+                            ${buildSelectOptions(["Sim", "Não"], sale.seguro || "", true)}
+                          </select>
+                        </label>
+                        <label>
+                          <span>Valor mensal seguro</span>
+                          <input type="text" name="valorSeguro" inputmode="decimal" value="${escapeHtml(sale.valorSeguro ? formatMoneyInputValue(Number(sale.valorSeguro || 0)) : "")}" />
+                        </label>
+                        <label>
+                          <span>Categoria</span>
+                          <select name="categoria">
+                            ${buildSelectOptions(["Smartphone", "Diversidade", "Reserva", "Outro"], sale.categoria || "", true)}
+                          </select>
+                        </label>
+                        <label>
+                          <span>IMEI/SN</span>
+                          <input type="text" name="imei" value="${escapeHtml(sale.imei || "")}" />
+                        </label>
+                        <label>
+                          <span>Nº Fatura</span>
+                          <input type="text" name="fatura" value="${escapeHtml(sale.fatura || "")}" />
+                        </label>
+                        <label>
+                          <span>Modalidade</span>
+                          <select name="modalidade">
+                            ${buildSelectOptions(["Pronto Pagamento", "MEOS", "Vencimento", "Prestações"], sale.modalidade || "", true)}
+                          </select>
+                        </label>
+                        <label class="billing-inline-notes">
+                          <span>Notas</span>
+                          <textarea name="notas" rows="2">${escapeHtml(sale.notas === "-" ? "" : sale.notas || "")}</textarea>
+                        </label>
+                      </div>
+                      <div class="billing-inline-actions">
+                        <button type="submit" class="primary-button compact">Guardar</button>
+                        <button type="button" class="ghost-button compact" data-cancel-billing-inline="${billingIndex}">Cancelar</button>
+                      </div>
+                    </form>
+                  </td>
+                </tr>
+              `
+              : ""
+          }
+        `;
+      })
       .join("");
   }
 
-  totalSales.textContent = String(visibleSales.length);
+  totalSales.textContent = String(monthSales.length);
   totalAmount.textContent = formatCurrency(
-    visibleSales.reduce((sum, sale) => sum + getBillingEffectiveValue(sale), 0)
+    monthSales.reduce((sum, sale) => sum + getBillingEffectiveValue(sale), 0)
   );
 }
 
-function renderMobileSales() {
-  const visibleSales = state.mobileSales.filter((sale) => isInSelectedMonth(sale.data));
+function renderBillingFilterMenus(monthSales) {
+  const menuDefinitions = [
+    {
+      field: "data",
+      values: [...new Set(monthSales.map((sale) => sale.data).filter(Boolean))].sort(),
+      formatter: (value) => formatDate(value),
+      emptyLabel: "Sem datas",
+    },
+    {
+      field: "seguro",
+      values: ["Sim", "Não"],
+      formatter: (value) => value,
+    },
+    {
+      field: "categoria",
+      values: [...new Set(monthSales.map((sale) => sale.categoria).filter(Boolean))].sort((a, b) =>
+        a.localeCompare(b)
+      ),
+      formatter: (value) => value,
+      emptyLabel: "Sem categorias",
+    },
+    {
+      field: "modalidade",
+      values: [...new Set(monthSales.map((sale) => sale.modalidade).filter(Boolean))].sort((a, b) =>
+        a.localeCompare(b)
+      ),
+      formatter: (value) => value,
+      emptyLabel: "Sem modalidades",
+    },
+  ];
 
-  if (visibleSales.length === 0) {
-    mobileTableBody.innerHTML = emptyRow(13, "Ainda não existem registos móveis.");
+  menuDefinitions.forEach(({ field, values, formatter, emptyLabel }) => {
+    const menu = document.querySelector(`[data-billing-filter-menu="${field}"]`);
+    const trigger = document.querySelector(`[data-billing-filter-trigger="${field}"]`);
+    if (!(menu instanceof HTMLElement) || !(trigger instanceof HTMLElement)) return;
+
+    const currentValue = billingFilters[field] || "";
+    trigger.classList.toggle("is-filtered", Boolean(currentValue));
+    trigger.setAttribute("aria-expanded", billingFilterOpenKey === field ? "true" : "false");
+
+    const items = [
+      `
+        <button type="button" class="billing-filter-option ${currentValue === "" ? "active" : ""}" data-billing-filter-value="${field}" data-billing-filter-choice="">
+          Todos
+        </button>
+      `,
+      ...(values.length > 0
+        ? values.map(
+            (value) => `
+              <button type="button" class="billing-filter-option ${currentValue === value ? "active" : ""}" data-billing-filter-value="${field}" data-billing-filter-choice="${escapeHtml(value)}">
+                ${escapeHtml(formatter(value))}
+              </button>
+            `
+          )
+        : [
+            `<div class="billing-filter-empty">${emptyLabel || "Sem opções"}</div>`,
+          ]),
+    ];
+
+    menu.innerHTML = items.join("");
+    menu.classList.toggle("open", billingFilterOpenKey === field);
+    menu.setAttribute("aria-hidden", billingFilterOpenKey === field ? "false" : "true");
+    if (billingFilterOpenKey === field) {
+      positionBillingFilterMenu(menu, trigger);
+    } else {
+      menu.style.left = "";
+      menu.style.top = "";
+      menu.style.transform = "";
+      menu.style.maxHeight = "";
+      menu.style.position = "";
+    }
+  });
+}
+
+function renderMobileFilterMenus(visibleSales) {
+  const menuDefinitions = [
+    {
+      field: "data",
+      values: [...new Set(visibleSales.map((sale) => sale.data).filter(Boolean))].sort(),
+      formatter: (value) => formatDate(value),
+      emptyLabel: "Sem datas",
+    },
+    {
+      field: "tarifario",
+      values: [...new Set(visibleSales.map((sale) => sale.tarifario).filter(Boolean))].sort((a, b) =>
+        a.localeCompare(b)
+      ),
+      formatter: (value) => value,
+      emptyLabel: "Sem tarifários",
+    },
+    {
+      field: "fidelizacao",
+      values: ["Sim", "Não"],
+      formatter: (value) => value,
+    },
+    {
+      field: "portabilidade",
+      values: ["Sim", "Não"],
+      formatter: (value) => value,
+    },
+    {
+      field: "bestOffer",
+      values: ["Sim", "Não"],
+      formatter: (value) => value,
+    },
+    {
+      field: "netSegura",
+      values: ["Sim", "Não"],
+      formatter: (value) => value,
+    },
+    {
+      field: "rceAceite",
+      values: ["Sim", "Não"],
+      formatter: (value) => value,
+    },
+  ];
+
+  menuDefinitions.forEach(({ field, values, formatter, emptyLabel }) => {
+    const menu = document.querySelector(`[data-mobile-filter-menu="${field}"]`);
+    const trigger = document.querySelector(`[data-mobile-filter-trigger="${field}"]`);
+    if (!(menu instanceof HTMLElement) || !(trigger instanceof HTMLElement)) return;
+
+    const currentValue = mobileFilters[field] || "";
+    trigger.classList.toggle("is-filtered", Boolean(currentValue));
+    trigger.setAttribute("aria-expanded", mobileFilterOpenKey === field ? "true" : "false");
+
+    const items = [
+      `
+        <button type="button" class="mobile-filter-option ${currentValue === "" ? "active" : ""}" data-mobile-filter-choice="${field}" data-mobile-filter-value="">
+          Todos
+        </button>
+      `,
+      ...(values.length > 0
+        ? values.map(
+            (value) => `
+              <button type="button" class="mobile-filter-option ${currentValue === value ? "active" : ""}" data-mobile-filter-choice="${field}" data-mobile-filter-value="${escapeHtml(value)}">
+                ${escapeHtml(formatter(value))}
+              </button>
+            `
+          )
+        : [`<div class="mobile-filter-empty">${emptyLabel || "Sem opções"}</div>`]),
+    ];
+
+    menu.innerHTML = items.join("");
+    menu.classList.toggle("open", mobileFilterOpenKey === field);
+    menu.setAttribute("aria-hidden", mobileFilterOpenKey === field ? "false" : "true");
+    if (mobileFilterOpenKey === field) {
+      positionBillingFilterMenu(menu, trigger);
+    } else {
+      menu.style.left = "";
+      menu.style.top = "";
+      menu.style.transform = "";
+      menu.style.maxHeight = "";
+      menu.style.position = "";
+      menu.style.zIndex = "";
+    }
+  });
+}
+
+function refreshMobileFilterMenus() {
+  renderMobileFilterMenus(state.mobileSales.filter((sale) => isInSelectedMonth(sale.data)));
+}
+
+function toggleMobileFilterMenu(field) {
+  mobileFilterOpenKey = mobileFilterOpenKey === field ? "" : field;
+  refreshMobileFilterMenus();
+}
+
+function closeMobileFilterMenu() {
+  if (!mobileFilterOpenKey) return;
+  mobileFilterOpenKey = "";
+  refreshMobileFilterMenus();
+}
+
+function buildSelectOptions(values, selectedValue, includeEmpty = false) {
+  return [
+    includeEmpty ? `<option value="">Selecionar</option>` : "",
+    ...values.map(
+      (value) => `<option value="${escapeHtml(value)}" ${selectedValue === value ? "selected" : ""}>${escapeHtml(value)}</option>`
+    ),
+  ].join("");
+}
+
+function formatMoneyInputValue(value) {
+  return Number.isFinite(value) ? Number(value).toFixed(2) : "";
+}
+
+function setBillingFilter(field, value) {
+  if (!(field in billingFilters)) return;
+  billingFilters = {
+    ...billingFilters,
+    [field]: value,
+  };
+}
+
+function toggleBillingFilterMenu(field) {
+  billingFilterOpenKey = billingFilterOpenKey === field ? "" : field;
+  refreshBillingFilterMenus();
+}
+
+function closeBillingFilterMenu() {
+  if (!billingFilterOpenKey) return;
+  billingFilterOpenKey = "";
+  refreshBillingFilterMenus();
+}
+
+function renderMobileSales() {
+  const visibleSales = state.mobileSales
+    .filter((sale) => isInSelectedMonth(sale.data))
+    .sort((a, b) => compareSaleDates(a.data, b.data));
+  renderMobileFilterMenus(visibleSales);
+
+  const filteredSales = visibleSales.filter((sale) => {
+    if (mobileFilters.data && sale.data !== mobileFilters.data) return false;
+    if (mobileFilters.tarifario && (sale.tarifario || "") !== mobileFilters.tarifario) return false;
+    if (mobileFilters.fidelizacao && (sale.fidelizacao || "") !== mobileFilters.fidelizacao) return false;
+    if (mobileFilters.portabilidade && (sale.portabilidade || "") !== mobileFilters.portabilidade) return false;
+    if (mobileFilters.bestOffer && (sale.bestOffer || "") !== mobileFilters.bestOffer) return false;
+    if (mobileFilters.netSegura && (sale.netSegura || "") !== mobileFilters.netSegura) return false;
+    if (mobileFilters.rceAceite && (sale.rceAceite || "") !== mobileFilters.rceAceite) return false;
+    return true;
+  });
+
+  if (filteredSales.length === 0) {
+    mobileTableBody.innerHTML = emptyRow(12, "Ainda não existem registos móveis.");
     return;
   }
 
-  mobileTableBody.innerHTML = visibleSales
+  mobileTableBody.innerHTML = filteredSales
     .map(
-      (sale) => `
-        <tr>
+      (sale) => {
+        const mobileIndex = state.mobileSales.indexOf(sale);
+        const isInlineEditing = mobileInlineEditingIndex === mobileIndex;
+
+        return `
+        <tr class="${isInlineEditing ? "mobile-inline-active" : ""}">
           <td>${formatDate(sale.data)}</td>
           <td>${escapeHtml(sale.nome || "")}</td>
           <td>${escapeHtml(sale.nif || "")}</td>
@@ -1339,13 +1912,89 @@ function renderMobileSales() {
           <td>${escapeHtml(sale.bestOffer || "")}</td>
           <td>${escapeHtml(sale.netSegura || "")}</td>
           <td>${escapeHtml(sale.rceAceite || "")}</td>
-          <td>${escapeHtml(sale.formaAceitacao || "")}</td>
           <td class="actions-cell">
-            <button type="button" class="table-action" data-edit-mobile="${state.mobileSales.indexOf(sale)}">Editar</button>
-            <button type="button" class="table-action delete" data-delete-mobile="${state.mobileSales.indexOf(sale)}">Eliminar</button>
+            <button type="button" class="table-action icon edit" data-edit-mobile="${mobileIndex}" aria-label="Editar" title="Editar">
+              <span class="billing-action-icon billing-action-icon-edit" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="table-action icon delete" data-delete-mobile="${mobileIndex}" aria-label="Eliminar" title="Eliminar">
+              <span class="billing-action-icon billing-action-icon-delete" aria-hidden="true"></span>
+            </button>
           </td>
         </tr>
-      `
+        ${
+          isInlineEditing
+            ? `
+              <tr class="mobile-inline-editor-row">
+                <td colspan="12">
+                  <form class="mobile-inline-form" data-mobile-inline-form="${mobileIndex}">
+                    <div class="billing-inline-grid">
+                      <label>
+                        <span>Data</span>
+                        <input type="date" name="data" value="${escapeHtml(sale.data || "")}" />
+                      </label>
+                      <label>
+                        <span>Nome</span>
+                        <input type="text" name="nome" value="${escapeHtml(sale.nome || "")}" />
+                      </label>
+                      <label>
+                        <span>NIF</span>
+                        <input type="text" name="nif" value="${escapeHtml(sale.nif || "")}" />
+                      </label>
+                      <label>
+                        <span>Número</span>
+                        <input type="text" name="numero" value="${escapeHtml(sale.numero || "")}" />
+                      </label>
+                      <label>
+                        <span>Tarifário</span>
+                        <input type="text" name="tarifario" value="${escapeHtml(sale.tarifario || "")}" />
+                      </label>
+                      <label>
+                        <span>ID</span>
+                        <input type="text" name="idVenda" value="${escapeHtml(sale.idVenda || "")}" />
+                      </label>
+                      <label>
+                        <span>Fidelização</span>
+                        <select name="fidelizacao">
+                          ${buildSelectOptions(["Sim", "Não"], sale.fidelizacao || "", true)}
+                        </select>
+                      </label>
+                      <label>
+                        <span>Portabilidade</span>
+                        <select name="portabilidade">
+                          ${buildSelectOptions(["Sim", "Não"], sale.portabilidade || "", true)}
+                        </select>
+                      </label>
+                      <label>
+                        <span>NBO</span>
+                        <select name="bestOffer">
+                          ${buildSelectOptions(["Sim", "Não"], sale.bestOffer || "", true)}
+                        </select>
+                      </label>
+                      <label>
+                        <span>Segura</span>
+                        <select name="netSegura">
+                          ${buildSelectOptions(["Sim", "Não"], sale.netSegura || "", true)}
+                        </select>
+                      </label>
+                      <label>
+                        <span>RCE Aceite</span>
+                        <select name="rceAceite">
+                          ${buildSelectOptions(["Sim", "Não"], sale.rceAceite || "", true)}
+                        </select>
+                      </label>
+                    </div>
+                    <div class="billing-inline-actions">
+                      <button type="submit" class="primary-button compact">Guardar</button>
+                      <button type="button" class="ghost-button compact" data-cancel-mobile-inline="${mobileIndex}">Cancelar</button>
+                    </div>
+                  </form>
+                </td>
+              </tr>
+            `
+            : ""
+        }
+      `;
+      }
     )
     .join("");
 }
@@ -1607,6 +2256,12 @@ function renderReport() {
     totals.energia += 1;
   });
 
+  const reportDates = [...summaryByDate.keys()].sort();
+  if (reportDateFilter && !reportDates.includes(reportDateFilter)) {
+    reportDateFilter = "";
+    reportDateFilterOpen = false;
+  }
+
   reportTotalNet.textContent = formatCurrency(totals.totalSemIva);
   reportTotalSmartphone.textContent = String(totals.smartphone);
   reportTotalDiversidade.textContent = String(totals.diversidade);
@@ -1614,9 +2269,12 @@ function renderReport() {
   reportTotalMovel.textContent = String(totals.movel);
   reportTotalEnergia.textContent = String(totals.energia);
 
-  const rows = Array.from(summaryByDate.entries()).sort(([a], [b]) =>
-    a < b ? 1 : a > b ? -1 : 0
-  );
+  refreshReportDateMenu();
+
+  const rows = reportDates
+    .filter((date) => !reportDateFilter || date === reportDateFilter)
+    .map((date) => ({ date, entry: summaryByDate.get(date) }))
+    .filter((row) => Boolean(row.entry));
 
   if (rows.length === 0) {
     reportTableBody.innerHTML = emptyRow(
@@ -1628,7 +2286,7 @@ function renderReport() {
 
   reportTableBody.innerHTML = rows
     .map(
-      ([date, entry]) => `
+      ({ date, entry }) => `
         <tr>
           <td>${formatDate(date)}</td>
           <td>${formatCurrency(entry.totalSemIva)}</td>
@@ -1648,51 +2306,103 @@ function renderGoals() {
 
   goalActualBilling.textContent = formatCurrency(metrics.actualBilling);
   goalTargetBilling.textContent = formatCurrency(metrics.goals.billing);
+  goalActualBilling.classList.toggle("goal-value-good", metrics.actualBilling >= metrics.goals.billing);
+  goalActualBilling.classList.toggle("goal-value-bad", metrics.actualBilling < metrics.goals.billing);
   goalPercentBilling.textContent = formatPercent(metrics.billingRatio * 100);
+  goalMissingBilling.textContent = formatCurrency(Math.max(metrics.goals.billing - metrics.actualBilling, 0));
   goalWeightedBilling.textContent = formatPercent(metrics.billingWeighted);
 
   goalActualMobile.textContent = String(metrics.actualMobile);
   goalTargetMobile.textContent = String(metrics.goals.mobile);
+  goalActualMobile.classList.toggle("goal-value-good", metrics.actualMobile >= metrics.goals.mobile);
+  goalActualMobile.classList.toggle("goal-value-bad", metrics.actualMobile < metrics.goals.mobile);
   goalPercentMobile.textContent = formatPercent(metrics.mobileRatio * 100);
+  goalMissingMobile.textContent = String(Math.max(metrics.goals.mobile - metrics.actualMobile, 0));
   goalWeightedMobile.textContent = formatPercent(metrics.mobileWeighted);
 
   goalActualEnergy.textContent = String(metrics.actualEnergy);
   goalTargetEnergy.textContent = String(metrics.goals.energy);
+  goalActualEnergy.classList.toggle("goal-value-good", metrics.actualEnergy >= metrics.goals.energy);
+  goalActualEnergy.classList.toggle("goal-value-bad", metrics.actualEnergy < metrics.goals.energy);
   goalPercentEnergy.textContent = formatPercent(metrics.energyRatio * 100);
+  goalMissingEnergy.textContent = String(Math.max(metrics.goals.energy - metrics.actualEnergy, 0));
   goalWeightedEnergy.textContent = formatPercent(metrics.energyWeighted);
 
   goalBillingProgress.textContent = formatPercent(metrics.billingRatio * 100);
   goalMobileProgress.textContent = formatPercent(metrics.mobileRatio * 100);
   goalEnergyProgress.textContent = formatPercent(metrics.energyRatio * 100);
   goalTotalProgress.textContent = formatPercent(metrics.totalWeighted);
-  goalInsuranceProgress.textContent = formatPercent(metrics.insuranceProgressRatio * 100);
+  goalInsuranceProgress.textContent = formatPercent(metrics.insuranceActualRatio * 100);
   goalDiversityProgress.textContent = formatPercent(metrics.diversityProgressRatio * 100);
 
   goalActualInsurance.textContent = formatPercent(metrics.insuranceActualRatio * 100);
   goalTargetInsurance.textContent = formatPercent(metrics.insuranceGoalRatio * 100);
-  goalPercentInsurance.textContent = formatPercent(metrics.insuranceProgressRatio * 100);
+  goalActualInsurance.classList.toggle(
+    "goal-value-good",
+    metrics.insuranceActualRatio >= metrics.insuranceGoalRatio
+  );
+  goalActualInsurance.classList.toggle(
+    "goal-value-bad",
+    metrics.insuranceActualRatio < metrics.insuranceGoalRatio
+  );
+  goalPercentInsurance.textContent = "";
+  const insuranceTargetCount = metrics.smartphoneCount > 0
+    ? Math.ceil(metrics.smartphoneCount * metrics.insuranceGoalRatio)
+    : 0;
+  goalMissingInsurance.textContent = String(
+    Math.max(insuranceTargetCount - metrics.smartphoneWithInsurance, 0)
+  );
   goalWeightedInsurance.textContent = `${metrics.smartphoneWithInsurance} / ${metrics.smartphoneCount}`;
 
   goalActualDiversity.textContent = formatPercent(metrics.diversityActualRatio * 100);
   goalTargetDiversity.textContent = formatPercent(metrics.diversityGoalRatio * 100);
-  goalPercentDiversity.textContent = formatPercent(metrics.diversityProgressRatio * 100);
+  goalActualDiversity.classList.toggle(
+    "goal-value-good",
+    metrics.diversityActualRatio >= metrics.diversityGoalRatio
+  );
+  goalActualDiversity.classList.toggle(
+    "goal-value-bad",
+    metrics.diversityActualRatio < metrics.diversityGoalRatio
+  );
+  goalPercentDiversity.textContent = "";
+  const diversityTargetCount = metrics.smartphoneCount > 0
+    ? Math.ceil(metrics.smartphoneCount * metrics.diversityGoalRatio)
+    : 0;
+  goalMissingDiversity.textContent = String(
+    Math.max(diversityTargetCount - metrics.diversidadeCount, 0)
+  );
   goalWeightedDiversity.textContent = `${metrics.diversidadeCount} / ${metrics.smartphoneCount}`;
 }
 
 function renderGeneral() {
   const months = getTrackedMonths();
+  const monthColors = [
+    "#ff8a80",
+    "#ffb74d",
+    "#fff176",
+    "#81c784",
+    "#4dd0e1",
+    "#64b5f6",
+    "#7986cb",
+    "#ba68c8",
+    "#f06292",
+    "#a1887f",
+    "#90a4ae",
+    "#ffd54f",
+  ];
 
   generalTableBody.innerHTML = months
-    .map((month) => {
+    .map((month, index) => {
       const metrics = getGoalMetrics(month);
+      const color = monthColors[index % monthColors.length];
       return `
-        <tr>
+        <tr class="${month === selectedMonth ? "general-month-selected" : ""}" style="--month-accent: ${color};">
           <td>${formatMonth(month)}</td>
           <td>${formatPercent(metrics.billingRatio * 100)}</td>
           <td>${formatPercent(metrics.mobileRatio * 100)}</td>
           <td>${formatPercent(metrics.energyRatio * 100)}</td>
-          <td>${formatPercent(metrics.insuranceProgressRatio * 100)}</td>
-          <td>${formatPercent(metrics.diversityProgressRatio * 100)}</td>
+          <td>${formatPercent(metrics.insuranceActualRatio * 100)}</td>
+          <td>${formatPercent(metrics.diversityActualRatio * 100)}</td>
           <td>${formatPercent(metrics.totalWeighted)}</td>
         </tr>
       `;
@@ -1783,21 +2493,54 @@ function editBillingSale(index) {
   const sale = state.billingSales[index];
   if (!sale) return;
 
-  editingBillingIndex = index;
-  fillForm(billingForm, sale);
-  billingForm.elements.namedItem("notas").value = sale.notas === "-" ? "" : sale.notas;
-  netValueInput.value = formatPlainCurrency(Number(sale.valorSemIva || 0));
-  billingForm.elements.namedItem("valorSeguro").value = sale.valorSeguro
-    ? String(Number(sale.valorSeguro).toFixed(2))
-    : "";
-  insuranceAnnualValueInput.value = sale.valorSeguro
-    ? formatPlainCurrency(Number(sale.valorSeguroAnual || 0))
-    : "";
+  billingInlineEditingIndex = index;
+  editingBillingIndex = null;
   activateTab("faturacao");
+  renderBillingSales();
+}
+
+function cancelBillingInlineEdit(index) {
+  if (billingInlineEditingIndex !== index) return;
+  billingInlineEditingIndex = null;
+  renderBillingSales();
+}
+
+async function saveBillingInlineEdit(form) {
+  const formData = new FormData(form);
+  const billingIndex = Number(form.dataset.billingInlineForm || "");
+  const existingSale = state.billingSales[billingIndex];
+  if (!existingSale) return;
+
+  const grossValue = parseMoneyInput(formData.get("valor"));
+  const valueOnSale = {
+    ...existingSale,
+    data: valueAsText(formData.get("data")),
+    nif: valueAsText(formData.get("nif")),
+    equipamento: valueAsText(formData.get("equipamento")),
+    valor: grossValue,
+    valorSemIva: calculateNetValue(grossValue),
+    seguro: valueAsText(formData.get("seguro")),
+    valorSeguro: parseMoneyInput(formData.get("valorSeguro")),
+    valorSeguroAnual: calculateInsuranceAnnual(parseMoneyInput(formData.get("valorSeguro"))),
+    categoria: valueAsText(formData.get("categoria")),
+    imei: valueAsText(formData.get("imei")),
+    fatura: valueAsText(formData.get("fatura")),
+    modalidade: valueAsText(formData.get("modalidade")),
+    notas: valueAsText(formData.get("notas")) || "-",
+  };
+
+  state.billingSales[billingIndex] = valueOnSale;
+  billingInlineEditingIndex = null;
+  await persistAndRender();
 }
 
 function deleteBillingSale(index) {
   state.billingSales.splice(index, 1);
+  if (billingInlineEditingIndex === index) {
+    billingInlineEditingIndex = null;
+  } else if (billingInlineEditingIndex !== null && index < billingInlineEditingIndex) {
+    billingInlineEditingIndex -= 1;
+  }
   if (editingBillingIndex === index) {
     editingBillingIndex = null;
     billingForm.reset();
@@ -1813,13 +2556,52 @@ function editMobileSale(index) {
   const sale = state.mobileSales[index];
   if (!sale) return;
 
-  editingMobileIndex = index;
-  fillForm(mobileForm, sale);
+  mobileInlineEditingIndex = index;
+  editingMobileIndex = null;
   activateTab("movel");
+  renderMobileSales();
+}
+
+function cancelMobileInlineEdit(index) {
+  if (mobileInlineEditingIndex !== index) return;
+  mobileInlineEditingIndex = null;
+  renderMobileSales();
+}
+
+async function saveMobileInlineEdit(form) {
+  const formData = new FormData(form);
+  const mobileIndex = Number(form.dataset.mobileInlineForm || "");
+  const existingSale = state.mobileSales[mobileIndex];
+  if (!existingSale) return;
+
+  const sale = {
+    ...existingSale,
+    data: valueAsText(formData.get("data")),
+    nome: valueAsText(formData.get("nome")),
+    nif: valueAsText(formData.get("nif")),
+    numero: valueAsText(formData.get("numero")),
+    tarifario: valueAsText(formData.get("tarifario")),
+    idVenda: valueAsText(formData.get("idVenda")),
+    fidelizacao: valueAsText(formData.get("fidelizacao")),
+    portabilidade: valueAsText(formData.get("portabilidade")),
+    bestOffer: valueAsText(formData.get("bestOffer")),
+    netSegura: valueAsText(formData.get("netSegura")),
+    rceAceite: valueAsText(formData.get("rceAceite")),
+    formaAceitacao: existingSale.formaAceitacao || "",
+  };
+
+  state.mobileSales[mobileIndex] = sale;
+  mobileInlineEditingIndex = null;
+  await persistAndRender();
 }
 
 function deleteMobileSale(index) {
   state.mobileSales.splice(index, 1);
+  if (mobileInlineEditingIndex === index) {
+    mobileInlineEditingIndex = null;
+  } else if (mobileInlineEditingIndex !== null && index < mobileInlineEditingIndex) {
+    mobileInlineEditingIndex -= 1;
+  }
   if (editingMobileIndex === index) {
     editingMobileIndex = null;
     mobileForm.reset();
@@ -2419,6 +3201,12 @@ function belongsToMonth(date, month) {
   return Boolean(date) && date.startsWith(month);
 }
 
+function compareSaleDates(dateA, dateB) {
+  const safeA = dateA || "9999-12-31";
+  const safeB = dateB || "9999-12-31";
+  return safeA.localeCompare(safeB);
+}
+
 function updateMonthLabel() {
   const [year, month] = selectedMonth.split("-");
   const date = new Date(Number(year), Number(month) - 1, 1);
@@ -2716,7 +3504,7 @@ function applyVisualSettings() {
     const tabId = tab.dataset.tab;
     if (!tabId) return;
     const tabColor = state.settings.sidebarTabColors?.[tabId] || DEFAULT_SIDEBAR_TAB_COLORS[tabId] || state.settings.primaryColor;
-    tab.style.color = tab.classList.contains("active") ? "#ffffff" : tabColor;
+    tab.style.setProperty("color", tabColor, "important");
   });
   Object.entries(DEFAULT_PAGE_COLORS).forEach(([panelId, fallbackColor]) => {
     const pageColor = state.settings.pageColors?.[panelId] || fallbackColor;
