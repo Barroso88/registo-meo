@@ -1628,7 +1628,7 @@ function renderBillingSales() {
         const rowAccent = getBillingDateAccent(sale.data);
 
         return `
-        <tr data-search-row-index="${billingIndex}" class="${isInlineEditing ? "billing-inline-active" : ""} billing-date-row ledger-date-row" style="--billing-row-text: ${rowAccent.accent}; --row-text-accent: ${rowAccent.accent};">
+        <tr data-search-row-index="${billingIndex}" class="${isInlineEditing ? "billing-inline-active" : ""} billing-date-row ledger-date-row" style="--billing-row-text: ${rowAccent.accent}; --row-text-accent: ${rowAccent.accent}; --ledger-row-bg: ${rowAccent.soft}; --ledger-row-bg-hover: ${rowAccent.softer}; --ledger-row-border: ${hexToRgba(rowAccent.accent, 0.38)};">
             <td>${formatDate(sale.data)}</td>
             <td>${escapeHtml(sale.nif || "")}</td>
             <td>${escapeHtml(sale.equipamento || "")}</td>
@@ -1966,7 +1966,7 @@ function renderMobileSales() {
         const rowAccent = getBillingDateAccent(sale.data);
 
         return `
-        <tr data-search-row-index="${mobileIndex}" class="${isInlineEditing ? "mobile-inline-active" : ""} mobile-date-row ledger-date-row" style="--row-text-accent: ${rowAccent.accent};">
+        <tr data-search-row-index="${mobileIndex}" class="${isInlineEditing ? "mobile-inline-active" : ""} mobile-date-row ledger-date-row" style="--row-text-accent: ${rowAccent.accent}; --ledger-row-bg: ${rowAccent.soft}; --ledger-row-bg-hover: ${rowAccent.softer}; --ledger-row-border: ${hexToRgba(rowAccent.accent, 0.38)};">
           <td>${formatDate(sale.data)}</td>
           <td>${escapeHtml(sale.nome || "")}</td>
           <td>${escapeHtml(sale.nif || "")}</td>
@@ -2083,7 +2083,7 @@ function renderEnergySales() {
         const isInlineEditing = energyInlineEditingIndex === energyIndex;
         const rowAccent = getBillingDateAccent(sale.data);
         return `
-        <tr data-search-row-index="${energyIndex}" class="${isInlineEditing ? "energy-inline-active" : ""} energy-date-row ledger-date-row" style="--row-text-accent: ${rowAccent.accent};">
+        <tr data-search-row-index="${energyIndex}" class="${isInlineEditing ? "energy-inline-active" : ""} energy-date-row ledger-date-row" style="--row-text-accent: ${rowAccent.accent}; --ledger-row-bg: ${rowAccent.soft}; --ledger-row-bg-hover: ${rowAccent.softer}; --ledger-row-border: ${hexToRgba(rowAccent.accent, 0.38)};">
           <td>${formatDate(sale.data)}</td>
           <td>${escapeHtml(sale.nome || "")}</td>
           <td>${escapeHtml(sale.nif || "")}</td>
@@ -3436,33 +3436,30 @@ function compareSaleDates(dateA, dateB) {
 
 function getBillingDateAccent(date) {
   const safeDate = String(date || "0000-00-00");
-  let hash = 0;
-  for (let index = 0; index < safeDate.length; index += 1) {
-    hash = (hash * 31 + safeDate.charCodeAt(index)) >>> 0;
+  const parsed = safeDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  let accent;
+
+  if (parsed) {
+    const year = Number(parsed[1]);
+    const month = Number(parsed[2]);
+    const day = Number(parsed[3]);
+    const utcDayIndex = Math.floor(Date.UTC(year, month - 1, day) / 86400000);
+    const hue = (utcDayIndex * 137.508) % 360;
+    accent = hslToHex(hue, 82, 56);
+  } else {
+    let hash = 0;
+    for (let index = 0; index < safeDate.length; index += 1) {
+      hash = (hash * 31 + safeDate.charCodeAt(index)) >>> 0;
+    }
+    accent = hslToHex(hash % 360, 82, 56);
   }
-  const palette = [
-    "#ff5b5b",
-    "#ff7a45",
-    "#ffb14a",
-    "#ffd84d",
-    "#b7ff4f",
-    "#73e85f",
-    "#34d399",
-    "#2dd4bf",
-    "#38bdf8",
-    "#60a5fa",
-    "#818cf8",
-    "#a855f7",
-    "#d946ef",
-    "#f472b6",
-    "#fb7185",
-    "#f43f5e",
-  ];
-  const accent = palette[hash % palette.length];
+
+  const soft = hexToRgba(accent, 0.18);
+  const softer = hexToRgba(accent, 0.28);
   return {
     accent,
-    soft: hexToRgba(accent, 0.06),
-    softer: hexToRgba(accent, 0.025),
+    soft,
+    softer,
     text: getReadableTextColor(accent),
   };
 }
@@ -3703,6 +3700,46 @@ function hexToRgba(hex, alpha) {
   const rgb = hexToRgb(hex);
   if (!rgb) return hex;
   return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+}
+
+function hslToHex(h, s, l) {
+  const hue = ((h % 360) + 360) % 360;
+  const saturation = Math.max(0, Math.min(100, s)) / 100;
+  const lightness = Math.max(0, Math.min(100, l)) / 100;
+  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+  const sector = hue / 60;
+  const secondary = chroma * (1 - Math.abs((sector % 2) - 1));
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+
+  if (sector >= 0 && sector < 1) {
+    red = chroma;
+    green = secondary;
+  } else if (sector >= 1 && sector < 2) {
+    red = secondary;
+    green = chroma;
+  } else if (sector >= 2 && sector < 3) {
+    green = chroma;
+    blue = secondary;
+  } else if (sector >= 3 && sector < 4) {
+    green = secondary;
+    blue = chroma;
+  } else if (sector >= 4 && sector < 5) {
+    red = secondary;
+    blue = chroma;
+  } else {
+    red = chroma;
+    blue = secondary;
+  }
+
+  const match = lightness - chroma / 2;
+  const toHex = (value) => {
+    const channel = Math.round((value + match) * 255);
+    return channel.toString(16).padStart(2, "0");
+  };
+
+  return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
 }
 
 async function handleCalculatorWidthChange(event) {

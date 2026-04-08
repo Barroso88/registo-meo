@@ -1,6 +1,51 @@
 {
   "billingSales": [
     {
+      "data": "2026-04-05",
+      "nif": "",
+      "equipamento": "",
+      "valor": 0,
+      "valorSemIva": 0,
+      "seguro": "",
+      "valorSeguro": 0,
+      "valorSeguroAnual": 0,
+      "categoria": "",
+      "imei": "",
+      "fatura": "",
+      "modalidade": "",
+      "notas": "-"
+    },
+    {
+      "data": "2026-04-02",
+      "nif": "",
+      "equipamento": "",
+      "valor": 0,
+      "valorSemIva": 0,
+      "seguro": "",
+      "valorSeguro": 0,
+      "valorSeguroAnual": 0,
+      "categoria": "",
+      "imei": "",
+      "fatura": "",
+      "modalidade": "",
+      "notas": "-"
+    },
+    {
+      "data": "2026-04-03",
+      "nif": "",
+      "equipamento": "",
+      "valor": 0,
+      "valorSemIva": 0,
+      "seguro": "",
+      "valorSeguro": 0,
+      "valorSeguroAnual": 0,
+      "categoria": "",
+      "imei": "",
+      "fatura": "",
+      "modalidade": "",
+      "notas": "-"
+    },
+    {
       "data": "2026-04-09",
       "nif": "",
       "equipamento": "",
