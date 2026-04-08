@@ -144,19 +144,12 @@
             </article>
           </div>
 
-          <div class="section-heading top-spacing">
-            <div>
-              <p class="eyebrow">Registo</p>
-              <h2>Adicionar faturação</h2>
-            </div>
-          </div>
-
-          <form class="sales-form" id="sales-form">
+          <form class="sales-form top-spacing billing-sales-form" id="sales-form">
             <label>
               Data
               <div class="date-field">
-                <input type="date" name="data" />
-                <button type="button" class="secondary-button date-today-button" data-date-target="billing">
+                <input type="date" name="data" tabindex="1" />
+                <button type="button" class="secondary-button date-today-button" data-date-target="billing" tabindex="-1">
                   Hoje
                 </button>
               </div>
@@ -164,7 +157,7 @@
 
             <label>
               Categoria
-              <select name="categoria">
+              <select name="categoria" tabindex="7">
                 <option value="">Selecionar</option>
                 <option value="Smartphone">Smartphone</option>
                 <option value="Diversidade">Diversidade</option>
@@ -175,12 +168,12 @@
 
             <label>
               NIF
-              <input type="text" name="nif" placeholder="Número de contribuinte" />
+              <input type="text" name="nif" placeholder="Número de contribuinte" tabindex="2" />
             </label>
 
             <label>
               Equipamento
-              <input type="text" name="equipamento" placeholder="Equipamento" />
+              <input type="text" name="equipamento" placeholder="Equipamento" tabindex="8" />
             </label>
 
             <label>
@@ -191,6 +184,7 @@
                 inputmode="decimal"
                 autocomplete="off"
                 placeholder="0,00"
+                tabindex="3"
               />
             </label>
 
@@ -202,12 +196,13 @@
                 id="net-value"
                 placeholder="Calculado automaticamente"
                 readonly
+                tabindex="-1"
               />
             </label>
 
             <label>
               Seguro
-              <select name="seguro">
+              <select name="seguro" tabindex="4">
                 <option value="">Selecionar</option>
                 <option value="Sim">Sim</option>
                 <option value="Não">Não</option>
@@ -216,7 +211,7 @@
 
             <label>
               Valor mensal do seguro
-              <select name="valorSeguro" id="insurance-value">
+              <select name="valorSeguro" id="insurance-value" tabindex="5">
                 <option value="">Selecionar</option>
                 <option value="1.99">1,99 €</option>
                 <option value="2.50">2,50 €</option>
@@ -248,22 +243,23 @@
                 id="insurance-annual-value"
                 placeholder="Calculado automaticamente"
                 readonly
+                tabindex="-1"
               />
             </label>
 
             <label>
               IMEI/SN
-              <input type="text" name="imei" placeholder="IMEI ou número de série" />
+              <input type="text" name="imei" placeholder="IMEI ou número de série" tabindex="9" />
             </label>
 
             <label>
               Nº Fatura
-              <input type="text" name="fatura" placeholder="Número da fatura" />
+              <input type="text" name="fatura" placeholder="Número da fatura" tabindex="6" />
             </label>
 
             <label>
               Modalidade
-              <select name="modalidade">
+              <select name="modalidade" tabindex="10">
                 <option value="">Selecionar</option>
                 <option value="Pronto Pagamento">Pronto Pagamento</option>
                 <option value="MEOS">MEOS</option>
@@ -278,22 +274,16 @@
                 name="notas"
                 rows="4"
                 placeholder="Observações sobre a venda"
+                tabindex="11"
               ></textarea>
             </label>
 
             <button type="submit" class="primary-button">Guardar registo</button>
           </form>
 
-          <div class="table-card billing-table-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="eyebrow">Lista</p>
-                <h3>Faturação registada</h3>
-              </div>
-            </div>
-
+          <div class="table-card billing-table-card ledger-table-card">
             <div class="table-wrap">
-              <table class="billing-table">
+              <table class="billing-table ledger-table">
                 <thead>
                   <tr>
                     <th class="billing-filter-th">
@@ -358,118 +348,116 @@
               <input class="panel-field-input" data-panel-field-color="movel" type="color" value="#0f1f56" />
             </label>
           </div>
-          <div class="section-heading top-spacing">
-            <div>
-              <p class="eyebrow">Registo</p>
-              <h2>Adicionar registo móvel</h2>
-            </div>
+          <div class="stats-grid mobile-stats-grid">
+            <article class="stat-card billing-card mobile-card mobile-card-total">
+              <span>Total de vendas</span>
+              <strong id="mobile-total-sales">0</strong>
+            </article>
           </div>
+          <form class="sales-form mobile-sales-form" id="mobile-form">
+            <div class="mobile-form-grid">
+              <div class="mobile-form-column">
+                <label>
+                  Data
+                  <div class="date-field">
+                    <input type="date" name="data" tabindex="1" />
+                    <button type="button" class="secondary-button date-today-button" data-date-target="mobile" tabindex="-1">
+                      Hoje
+                    </button>
+                  </div>
+                </label>
 
-          <form class="sales-form" id="mobile-form">
-            <label>
-              Data
-              <div class="date-field">
-                <input type="date" name="data" />
-                <button type="button" class="secondary-button date-today-button" data-date-target="mobile">
-                  Hoje
-                </button>
+                <label>
+                  Nome
+                  <input type="text" name="nome" placeholder="Nome do cliente" tabindex="2" />
+                </label>
+
+                <label>
+                  NIF
+                  <input type="text" name="nif" placeholder="Número de contribuinte" tabindex="3" />
+                </label>
+
+                <label>
+                  Número
+                  <input type="text" name="numero" placeholder="Número de telemóvel" tabindex="4" />
+                </label>
+
+                <label>
+                  Tarifário
+                  <input type="text" name="tarifario" placeholder="Tarifário" tabindex="5" />
+                </label>
+
+                <label>
+                  ID
+                  <input type="text" name="idVenda" placeholder="Identificador da venda" tabindex="6" />
+                </label>
               </div>
-            </label>
 
-            <label>
-              Nome
-              <input type="text" name="nome" placeholder="Nome do cliente" />
-            </label>
+              <div class="mobile-form-column">
+                <label>
+                  Fidelização
+                  <select name="fidelizacao" tabindex="7">
+                    <option value="">Selecionar</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                  </select>
+                </label>
 
-            <label>
-              NIF
-              <input type="text" name="nif" placeholder="Número de contribuinte" />
-            </label>
+                <label>
+                  Portabilidade
+                  <select name="portabilidade" tabindex="8">
+                    <option value="">Selecionar</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                  </select>
+                </label>
 
-            <label>
-              Número
-              <input type="text" name="numero" placeholder="Número de telemóvel" />
-            </label>
+                <label>
+                  Best Offer
+                  <select name="bestOffer" tabindex="9">
+                    <option value="">Selecionar</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                  </select>
+                </label>
 
-            <label>
-              Tarifário
-              <input type="text" name="tarifario" placeholder="Tarifário" />
-            </label>
+                <label>
+                  Net Segura
+                  <select name="netSegura" tabindex="10">
+                    <option value="">Selecionar</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                  </select>
+                </label>
 
-            <label>
-              ID
-              <input type="text" name="idVenda" placeholder="Identificador da venda" />
-            </label>
+                <label>
+                  RCE Aceite
+                  <select name="rceAceite" tabindex="11">
+                    <option value="">Selecionar</option>
+                    <option value="Sim">Sim</option>
+                    <option value="Não">Não</option>
+                  </select>
+                </label>
 
-            <label>
-              Fidelização
-              <select name="fidelizacao">
-                <option value="">Selecionar</option>
-                <option value="Sim">Sim</option>
-                <option value="Não">Não</option>
-              </select>
-            </label>
+                <label>
+                  Forma de Aceitação
+                  <select name="formaAceitacao" tabindex="-1">
+                    <option value="">Selecionar</option>
+                    <option value="SMS">SMS</option>
+                    <option value="Email">Email</option>
+                    <option value="PIN">PIN</option>
+                    <option value="Assinado">Assinado</option>
+                  </select>
+                </label>
+              </div>
+            </div>
 
-            <label>
-              Portabilidade
-              <select name="portabilidade">
-                <option value="">Selecionar</option>
-                <option value="Sim">Sim</option>
-                <option value="Não">Não</option>
-              </select>
-            </label>
-
-            <label>
-              Best Offer
-              <select name="bestOffer">
-                <option value="">Selecionar</option>
-                <option value="Sim">Sim</option>
-                <option value="Não">Não</option>
-              </select>
-            </label>
-
-            <label>
-              Net Segura
-              <select name="netSegura">
-                <option value="">Selecionar</option>
-                <option value="Sim">Sim</option>
-                <option value="Não">Não</option>
-              </select>
-            </label>
-
-            <label>
-              RCE Aceite
-              <select name="rceAceite">
-                <option value="">Selecionar</option>
-                <option value="Sim">Sim</option>
-                <option value="Não">Não</option>
-              </select>
-            </label>
-
-            <label>
-              Forma de Aceitação
-              <select name="formaAceitacao">
-                <option value="">Selecionar</option>
-                <option value="SMS">SMS</option>
-                <option value="Email">Email</option>
-                <option value="PIN">PIN</option>
-                <option value="Assinado">Assinado</option>
-              </select>
-            </label>
-
-            <button type="submit" class="primary-button">Guardar registo móvel</button>
+            <button type="submit" class="primary-button mobile-submit-button" tabindex="12">Guardar registo móvel</button>
           </form>
 
-          <div class="table-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="eyebrow">Lista</p>
-                <h3>Registos móveis</h3>
-              </div>
-            </div>
-
+          <div class="table-card mobile-table-card ledger-table-card">
             <div class="table-wrap">
-              <table class="mobile-table">
+              <table class="mobile-table ledger-table">
                 <thead>
                   <tr>
                     <th class="mobile-filter-th">
@@ -477,24 +465,27 @@
                         <span class="mobile-filter-arrow">▾</span>
                         <span>Data</span>
                       </button>
+                      <span class="mobile-column-resizer" data-mobile-column-resize="data" aria-hidden="true"></span>
                       <div class="mobile-filter-menu" data-mobile-filter-menu="data" aria-hidden="true"></div>
                     </th>
-                    <th>Nome</th>
-                    <th>NIF</th>
-                    <th>Número</th>
+                    <th>Nome<span class="mobile-column-resizer" data-mobile-column-resize="nome" aria-hidden="true"></span></th>
+                    <th>NIF<span class="mobile-column-resizer" data-mobile-column-resize="nif" aria-hidden="true"></span></th>
+                    <th>Número<span class="mobile-column-resizer" data-mobile-column-resize="numero" aria-hidden="true"></span></th>
                     <th class="mobile-filter-th">
                       <button class="mobile-filter-trigger" type="button" data-mobile-filter-trigger="tarifario">
                         <span class="mobile-filter-arrow">▾</span>
                         <span>Tarifário</span>
                       </button>
+                      <span class="mobile-column-resizer" data-mobile-column-resize="tarifario" aria-hidden="true"></span>
                       <div class="mobile-filter-menu" data-mobile-filter-menu="tarifario" aria-hidden="true"></div>
                     </th>
-                    <th>ID</th>
+                    <th>ID<span class="mobile-column-resizer" data-mobile-column-resize="idVenda" aria-hidden="true"></span></th>
                     <th class="mobile-filter-th">
                       <button class="mobile-filter-trigger" type="button" data-mobile-filter-trigger="fidelizacao">
                         <span class="mobile-filter-arrow">▾</span>
                         <span>FID</span>
                       </button>
+                      <span class="mobile-column-resizer" data-mobile-column-resize="fidelizacao" aria-hidden="true"></span>
                       <div class="mobile-filter-menu" data-mobile-filter-menu="fidelizacao" aria-hidden="true"></div>
                     </th>
                     <th class="mobile-filter-th">
@@ -502,6 +493,7 @@
                         <span class="mobile-filter-arrow">▾</span>
                         <span>PORT</span>
                       </button>
+                      <span class="mobile-column-resizer" data-mobile-column-resize="portabilidade" aria-hidden="true"></span>
                       <div class="mobile-filter-menu" data-mobile-filter-menu="portabilidade" aria-hidden="true"></div>
                     </th>
                     <th class="mobile-filter-th">
@@ -509,6 +501,7 @@
                         <span class="mobile-filter-arrow">▾</span>
                         <span>NBO</span>
                       </button>
+                      <span class="mobile-column-resizer" data-mobile-column-resize="bestOffer" aria-hidden="true"></span>
                       <div class="mobile-filter-menu" data-mobile-filter-menu="bestOffer" aria-hidden="true"></div>
                     </th>
                     <th class="mobile-filter-th">
@@ -516,6 +509,7 @@
                         <span class="mobile-filter-arrow">▾</span>
                         <span>Segura</span>
                       </button>
+                      <span class="mobile-column-resizer" data-mobile-column-resize="netSegura" aria-hidden="true"></span>
                       <div class="mobile-filter-menu" data-mobile-filter-menu="netSegura" aria-hidden="true"></div>
                     </th>
                     <th class="mobile-filter-th">
@@ -523,6 +517,7 @@
                         <span class="mobile-filter-arrow">▾</span>
                         <span>RCE</span>
                       </button>
+                      <span class="mobile-column-resizer" data-mobile-column-resize="rceAceite" aria-hidden="true"></span>
                       <div class="mobile-filter-menu" data-mobile-filter-menu="rceAceite" aria-hidden="true"></div>
                     </th>
                     <th>Ações</th>
@@ -553,73 +548,78 @@
               <input class="panel-field-input" data-panel-field-color="meo-energia" type="color" value="#0f1f56" />
             </label>
           </div>
-          <div class="section-heading top-spacing">
-            <div>
-              <p class="eyebrow">Registo</p>
-              <h2>Adicionar registo de energia</h2>
-            </div>
+          <div class="stats-grid mobile-stats-grid meo-energy-stats-grid">
+            <article class="stat-card billing-card meo-energy-card-total">
+              <span>Total de vendas</span>
+              <strong id="energy-total-sales">0</strong>
+            </article>
           </div>
+          <form class="sales-form meo-energy-sales-form" id="energy-form">
+            <div class="meo-energy-form-grid">
+              <div class="meo-energy-form-column">
+                <label>
+                  Data
+                  <div class="date-field">
+                    <input type="date" name="data" />
+                    <button type="button" class="secondary-button date-today-button" data-date-target="energy">
+                      Hoje
+                    </button>
+                  </div>
+                </label>
 
-          <form class="sales-form" id="energy-form">
-            <label>
-              Data
-              <div class="date-field">
-                <input type="date" name="data" />
-                <button type="button" class="secondary-button date-today-button" data-date-target="energy">
-                  Hoje
-                </button>
+                <label>
+                  Nome
+                  <input type="text" name="nome" placeholder="Nome do cliente" />
+                </label>
+
+                <label>
+                  NIF
+                  <input type="text" name="nif" placeholder="Número de contribuinte" />
+                </label>
+
+                <label>
+                  ID Venda
+                  <input type="text" name="idVenda" placeholder="Identificador da venda" />
+                </label>
               </div>
-            </label>
 
-            <label>
-              Nome
-              <input type="text" name="nome" placeholder="Nome do cliente" />
-            </label>
+              <div class="meo-energy-form-column">
+                <label>
+                  Nº Requisição
+                  <input type="text" name="requisicao" placeholder="Número da requisição" />
+                </label>
 
-            <label>
-              NIF
-              <input type="text" name="nif" placeholder="Número de contribuinte" />
-            </label>
+                <label>
+                  Potência
+                  <select name="potencia">
+                    <option value="">Selecionar</option>
+                    <option value="1.15">1.15</option>
+                    <option value="2.30">2.30</option>
+                    <option value="3.45">3.45</option>
+                    <option value="4.60">4.60</option>
+                    <option value="5.75">5.75</option>
+                    <option value="6.90">6.90</option>
+                    <option value="10.35">10.35</option>
+                    <option value="13.80">13.80</option>
+                    <option value="17.25">17.25</option>
+                    <option value="20.70">20.70</option>
+                    <option value="27.60">27.60</option>
+                    <option value="34.50">34.50</option>
+                    <option value="41.40">41.40</option>
+                  </select>
+                </label>
 
-            <label>
-              ID Venda
-              <input type="text" name="idVenda" placeholder="Identificador da venda" />
-            </label>
-
-            <label>
-              Nº Requisição
-              <input type="text" name="requisicao" placeholder="Número da requisição" />
-            </label>
-
-            <label>
-              Potência
-              <select name="potencia">
-                <option value="">Selecionar</option>
-                <option value="1.15">1.15</option>
-                <option value="2.30">2.30</option>
-                <option value="3.45">3.45</option>
-                <option value="4.60">4.60</option>
-                <option value="5.75">5.75</option>
-                <option value="6.90">6.90</option>
-                <option value="10.35">10.35</option>
-                <option value="13.80">13.80</option>
-                <option value="17.25">17.25</option>
-                <option value="20.70">20.70</option>
-                <option value="27.60">27.60</option>
-                <option value="34.50">34.50</option>
-                <option value="41.40">41.40</option>
-              </select>
-            </label>
-
-            <label>
-              Estado
-              <select name="estado">
-                <option value="">Selecionar</option>
-                <option value="Instalado">Instalado</option>
-                <option value="Pendente">Pendente</option>
-                <option value="Rejeitado">Rejeitado</option>
-              </select>
-            </label>
+                <label>
+                  Estado
+                  <select name="estado">
+                    <option value="">Selecionar</option>
+                    <option value="Instalado">Instalado</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Rejeitado">Rejeitado</option>
+                  </select>
+                </label>
+              </div>
+            </div>
 
             <label class="full-width">
               Observações
@@ -630,19 +630,12 @@
               ></textarea>
             </label>
 
-            <button type="submit" class="primary-button">Guardar registo de energia</button>
+            <button type="submit" class="primary-button meo-energy-submit-button">Guardar registo de energia</button>
           </form>
 
-          <div class="table-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="eyebrow">Lista</p>
-                <h3>Registos MEO Energia</h3>
-              </div>
-            </div>
-
+          <div class="table-card meo-energy-table-card ledger-table-card">
             <div class="table-wrap">
-              <table>
+              <table class="meo-energy-table ledger-table">
                 <thead>
                   <tr>
                     <th>Data</th>
@@ -709,13 +702,6 @@
           </div>
 
           <div class="table-card report-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="eyebrow">Resumo por Dia</p>
-                <h3>Relatório consolidado</h3>
-              </div>
-            </div>
-
             <div class="table-wrap">
               <table class="report-table">
                 <thead>
@@ -1155,13 +1141,6 @@
           </form>
 
           <div class="table-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="eyebrow">Comparação</p>
-                <h3>Real vs Objetivo</h3>
-              </div>
-            </div>
-
             <div class="table-wrap">
               <table class="goal-comparison-table">
                 <thead>
@@ -1243,13 +1222,6 @@
             </label>
           </div>
           <div class="table-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="eyebrow">Resumo Mensal</p>
-                <h3>Objetivos por Mês</h3>
-              </div>
-            </div>
-
             <div class="table-wrap">
               <table class="general-table">
                 <thead>
@@ -1372,29 +1344,22 @@
             </label>
           </div>
           <div class="support-nav">
-            <button class="support-tab active" data-support-tab="seguros" type="button">
+            <button class="support-tab active support-tab-seguros" data-support-tab="seguros" type="button">
               Seguros
             </button>
-            <button class="support-tab" data-support-tab="meo-energia" type="button">
+            <button class="support-tab support-tab-energy" data-support-tab="meo-energia" type="button">
               MEO ENERGIA
             </button>
-            <button class="support-tab" data-support-tab="contactos" type="button">
+            <button class="support-tab support-tab-contactos" data-support-tab="contactos" type="button">
               Contactos
             </button>
-            <button class="support-tab" data-support-tab="calculadora" type="button">
+            <button class="support-tab support-tab-calculadora" data-support-tab="calculadora" type="button">
               Calculadora
             </button>
           </div>
 
           <section class="support-panel active" id="support-seguros">
           <div class="table-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="eyebrow">Referência</p>
-                <h3>Seguros Roubo & Danos Acidentais</h3>
-              </div>
-            </div>
-
             <div class="support-block support-tone-mobile">
               <p class="support-title">Seguro Telemóveis</p>
               <div class="table-wrap">
@@ -1479,11 +1444,7 @@
           </section>
           <section class="support-panel" id="support-meo-energia">
             <div class="table-card">
-              <div class="section-heading compact">
-                <div>
-                  <p class="eyebrow">Referência</p>
-                  <h3>MEO Energia - Tarifa Fixa de Eletricidade</h3>
-                </div>
+              <div class="meo-energy-top-actions">
                 <a
                   class="support-action-button"
                   href="./assets/meo-energia-info.pdf"
@@ -1621,13 +1582,6 @@
           </section>
           <section class="support-panel" id="support-contactos">
             <div class="table-card">
-              <div class="section-heading compact">
-                <div>
-                  <p class="eyebrow">Referência</p>
-                  <h3>Contactos MEO</h3>
-                </div>
-              </div>
-
               <div class="contacts-grid">
                 <article class="contact-card">
                   <p class="support-title">Apoio ao Cliente</p>
@@ -1776,33 +1730,26 @@
           </div>
 
           <div class="table-card">
-            <div class="section-heading compact">
-              <div>
-                <p class="eyebrow">Campanha</p>
-                <h3>Incentivos por Modelo</h3>
-              </div>
-            </div>
-
             <div class="support-nav incentives-nav">
-              <button class="support-tab incentive-tab active" data-incentive-tab="samsung" type="button">
+              <button class="support-tab support-tab-samsung incentive-tab active" data-incentive-tab="samsung" type="button">
                 Samsung
               </button>
-              <button class="support-tab incentive-tab" data-incentive-tab="honor" type="button">
+              <button class="support-tab support-tab-honor incentive-tab" data-incentive-tab="honor" type="button">
                 Honor
               </button>
-              <button class="support-tab incentive-tab" data-incentive-tab="xiaomi" type="button">
+              <button class="support-tab support-tab-xiaomi incentive-tab" data-incentive-tab="xiaomi" type="button">
                 Xiaomi
               </button>
-              <button class="support-tab incentive-tab" data-incentive-tab="motorola" type="button">
+              <button class="support-tab support-tab-motorola incentive-tab" data-incentive-tab="motorola" type="button">
                 Motorola
               </button>
-              <button class="support-tab incentive-tab" data-incentive-tab="tcl" type="button">
+              <button class="support-tab support-tab-tcl incentive-tab" data-incentive-tab="tcl" type="button">
                 TCL
               </button>
-              <button class="support-tab incentive-tab" data-incentive-tab="wearables" type="button">
+              <button class="support-tab support-tab-wearables incentive-tab" data-incentive-tab="wearables" type="button">
                 Wearables
               </button>
-              <button class="support-tab incentive-tab" data-incentive-tab="tablets" type="button">
+              <button class="support-tab support-tab-tablets incentive-tab" data-incentive-tab="tablets" type="button">
                 Tablet's
               </button>
             </div>

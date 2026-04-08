@@ -13,6 +13,7 @@ const stockForm = document.getElementById("stock-form");
 
 const billingTableBody = document.getElementById("sales-table-body");
 const mobileTableBody = document.getElementById("mobile-table-body");
+const mobileTable = document.querySelector(".mobile-table");
 const energyTableBody = document.getElementById("energy-table-body");
 const reportTableBody = document.getElementById("report-table-body");
 const generalTableBody = document.getElementById("general-table-body");
@@ -96,14 +97,14 @@ const sidebarTabColorInputs = {
 };
 
 const ACCESS_SERVICES = [
-  { id: "sap-comercial", label: "SAP Comercial" },
-  { id: "portal-sfa", label: "Portal SFA" },
-  { id: "user-rede", label: "User de Rede" },
-  { id: "pos-venda", label: "Pós-Venda" },
-  { id: "blueticket", label: "Blueticket" },
-  { id: "intelcia", label: "Intelcia" },
-  { id: "eform", label: "EForm" },
-  { id: "bec-deposito", label: "BEC Depósito" },
+  { id: "sap-comercial", label: "SAP Comercial", color: "#8fd7ff" },
+  { id: "portal-sfa", label: "Portal SFA", color: "#7ee081" },
+  { id: "user-rede", label: "User de Rede", color: "#ff9f43" },
+  { id: "pos-venda", label: "Pós-Venda", color: "#ff6b6b" },
+  { id: "blueticket", label: "Blueticket", color: "#d68bff" },
+  { id: "intelcia", label: "Intelcia", color: "#7db7ff" },
+  { id: "eform", label: "EForm", color: "#f8d84c" },
+  { id: "bec-deposito", label: "BEC Depósito", color: "#5ef0b2" },
 ];
 
 const DEFAULT_SIDEBAR_TAB_COLORS = {
@@ -120,6 +121,36 @@ const DEFAULT_SIDEBAR_TAB_COLORS = {
   acessos: "#ff7d7d",
   configuracoes: "#f77dd6",
 };
+
+const DEFAULT_MOBILE_COLUMN_WIDTHS = {
+  data: 60,
+  nome: 126,
+  nif: 66,
+  numero: 74,
+  tarifario: 118,
+  idVenda: 64,
+  fidelizacao: 58,
+  portabilidade: 58,
+  bestOffer: 58,
+  netSegura: 62,
+  rceAceite: 58,
+  actions: 88,
+};
+
+const MOBILE_COLUMN_KEYS = [
+  "data",
+  "nome",
+  "nif",
+  "numero",
+  "tarifario",
+  "idVenda",
+  "fidelizacao",
+  "portabilidade",
+  "bestOffer",
+  "netSegura",
+  "rceAceite",
+  "actions",
+];
 
 const DEFAULT_PAGE_BLOCK_COLORS = {
   relatorios: "#13214d",
@@ -168,6 +199,8 @@ function buildDefaultAccessEntries(source = {}) {
 
 const totalSales = document.getElementById("total-sales");
 const totalAmount = document.getElementById("total-amount");
+const mobileTotalSales = document.getElementById("mobile-total-sales");
+const energyTotalSales = document.getElementById("energy-total-sales");
 const grossValueInput = billingForm.elements.namedItem("valor");
 const netValueInput = document.getElementById("net-value");
 const insuranceValueInput = document.getElementById("insurance-value");
@@ -436,6 +469,7 @@ const state = {
   sidebarButtonStyle: "style-1",
   toolbarColor: "#b3262d",
     sidebarTabColors: { ...DEFAULT_SIDEBAR_TAB_COLORS },
+    mobileColumnWidths: { ...DEFAULT_MOBILE_COLUMN_WIDTHS },
     pageColors: { ...DEFAULT_PAGE_COLORS },
     pageBlockColors: { ...DEFAULT_PAGE_BLOCK_COLORS },
     pageFieldColors: { ...DEFAULT_PAGE_FIELD_COLORS },
@@ -465,9 +499,11 @@ let billingInlineEditingIndex = null;
 let mobileInlineEditingIndex = null;
 let editingMobileIndex = null;
 let editingEnergyIndex = null;
+let energyInlineEditingIndex = null;
 let editingTaskIndex = null;
 let editingStockIndex = null;
 let selectedMonth = getCurrentMonth();
+let mobileColumnResizeState = null;
 let selectedIncentiveBrand = "samsung";
 let selectedAccessService = ACCESS_SERVICES[0].id;
 let accessPasswordVisible = false;
@@ -826,6 +862,10 @@ document.addEventListener("click", (event) => {
     closeBillingFilterMenu();
   }
 });
+
+document.addEventListener("pointermove", updateMobileColumnResize);
+document.addEventListener("pointerup", finishMobileColumnResize);
+document.addEventListener("pointercancel", finishMobileColumnResize);
 
 window.addEventListener("resize", () => {
   if (billingFilterOpenKey) {
@@ -1304,9 +1344,23 @@ energyTableBody.addEventListener("click", async (event) => {
     editEnergySale(Number(target.dataset.editEnergy));
   }
 
+  if (target.dataset.cancelEnergyInline !== undefined) {
+    cancelEnergyInlineEdit(Number(target.dataset.cancelEnergyInline));
+  }
+
   if (target.dataset.deleteEnergy !== undefined) {
     deleteEnergySale(Number(target.dataset.deleteEnergy));
     await persistAndRender();
+  }
+});
+
+energyTableBody.addEventListener("submit", async (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLFormElement)) return;
+
+  if (target.matches("[data-energy-inline-form]")) {
+    event.preventDefault();
+    await saveEnergyInlineEdit(target);
   }
 });
 
@@ -1411,6 +1465,12 @@ async function initialize() {
           ? remoteState.settings.sidebarTabColors
           : {}),
       },
+      mobileColumnWidths: {
+        ...DEFAULT_MOBILE_COLUMN_WIDTHS,
+        ...(remoteState.settings?.mobileColumnWidths && typeof remoteState.settings.mobileColumnWidths === "object"
+          ? remoteState.settings.mobileColumnWidths
+          : {}),
+      },
       pageColors: {
         ...DEFAULT_PAGE_COLORS,
         ...(remoteState.settings?.pageColors && typeof remoteState.settings.pageColors === "object"
@@ -1446,6 +1506,7 @@ async function initialize() {
   applyVisualSettings();
   initializeConfigAccordion();
   renderAll();
+  initializeMobileColumnResizing();
 }
 
 async function fetchState() {
@@ -1564,9 +1625,10 @@ function renderBillingSales() {
       .map((sale) => {
         const billingIndex = state.billingSales.indexOf(sale);
         const isInlineEditing = billingInlineEditingIndex === billingIndex;
+        const rowAccent = getBillingDateAccent(sale.data);
 
         return `
-          <tr class="${isInlineEditing ? "billing-inline-active" : ""}">
+        <tr data-search-row-index="${billingIndex}" class="${isInlineEditing ? "billing-inline-active" : ""} billing-date-row ledger-date-row" style="--billing-row-text: ${rowAccent.accent}; --row-text-accent: ${rowAccent.accent};">
             <td>${formatDate(sale.data)}</td>
             <td>${escapeHtml(sale.nif || "")}</td>
             <td>${escapeHtml(sale.equipamento || "")}</td>
@@ -1876,6 +1938,9 @@ function renderMobileSales() {
     .filter((sale) => isInSelectedMonth(sale.data))
     .sort((a, b) => compareSaleDates(a.data, b.data));
   renderMobileFilterMenus(visibleSales);
+  if (mobileTotalSales instanceof HTMLElement) {
+    mobileTotalSales.textContent = String(visibleSales.length);
+  }
 
   const filteredSales = visibleSales.filter((sale) => {
     if (mobileFilters.data && sale.data !== mobileFilters.data) return false;
@@ -1898,9 +1963,10 @@ function renderMobileSales() {
       (sale) => {
         const mobileIndex = state.mobileSales.indexOf(sale);
         const isInlineEditing = mobileInlineEditingIndex === mobileIndex;
+        const rowAccent = getBillingDateAccent(sale.data);
 
         return `
-        <tr class="${isInlineEditing ? "mobile-inline-active" : ""}">
+        <tr data-search-row-index="${mobileIndex}" class="${isInlineEditing ? "mobile-inline-active" : ""} mobile-date-row ledger-date-row" style="--row-text-accent: ${rowAccent.accent};">
           <td>${formatDate(sale.data)}</td>
           <td>${escapeHtml(sale.nome || "")}</td>
           <td>${escapeHtml(sale.nif || "")}</td>
@@ -1926,7 +1992,7 @@ function renderMobileSales() {
             ? `
               <tr class="mobile-inline-editor-row">
                 <td colspan="12">
-                  <form class="mobile-inline-form" data-mobile-inline-form="${mobileIndex}">
+                  <form class="billing-inline-form mobile-inline-form" data-mobile-inline-form="${mobileIndex}">
                     <div class="billing-inline-grid">
                       <label>
                         <span>Data</span>
@@ -2001,6 +2067,9 @@ function renderMobileSales() {
 
 function renderEnergySales() {
   const visibleSales = state.energySales.filter((sale) => isInSelectedMonth(sale.data));
+  if (energyTotalSales instanceof HTMLElement) {
+    energyTotalSales.textContent = String(visibleSales.length);
+  }
 
   if (visibleSales.length === 0) {
     energyTableBody.innerHTML = emptyRow(9, "Ainda não existem registos de energia.");
@@ -2009,8 +2078,12 @@ function renderEnergySales() {
 
   energyTableBody.innerHTML = visibleSales
     .map(
-      (sale) => `
-        <tr>
+      (sale) => {
+        const energyIndex = state.energySales.indexOf(sale);
+        const isInlineEditing = energyInlineEditingIndex === energyIndex;
+        const rowAccent = getBillingDateAccent(sale.data);
+        return `
+        <tr data-search-row-index="${energyIndex}" class="${isInlineEditing ? "energy-inline-active" : ""} energy-date-row ledger-date-row" style="--row-text-accent: ${rowAccent.accent};">
           <td>${formatDate(sale.data)}</td>
           <td>${escapeHtml(sale.nome || "")}</td>
           <td>${escapeHtml(sale.nif || "")}</td>
@@ -2020,11 +2093,70 @@ function renderEnergySales() {
           <td>${escapeHtml(sale.estado || "")}</td>
           <td>${escapeHtml(sale.observacoes || "")}</td>
           <td class="actions-cell">
-            <button type="button" class="table-action" data-edit-energy="${state.energySales.indexOf(sale)}">Editar</button>
-            <button type="button" class="table-action delete" data-delete-energy="${state.energySales.indexOf(sale)}">Eliminar</button>
+            <button type="button" class="table-action icon edit" data-edit-energy="${energyIndex}" aria-label="Editar" title="Editar">
+              <span class="billing-action-icon billing-action-icon-edit" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="table-action icon delete" data-delete-energy="${energyIndex}" aria-label="Eliminar" title="Eliminar">
+              <span class="billing-action-icon billing-action-icon-delete" aria-hidden="true"></span>
+            </button>
           </td>
         </tr>
-      `
+        ${
+          isInlineEditing
+            ? `
+              <tr class="energy-inline-editor-row">
+                <td colspan="9">
+                  <form class="billing-inline-form energy-inline-form" data-energy-inline-form="${energyIndex}">
+                    <div class="billing-inline-grid">
+                      <label>
+                        <span>Data</span>
+                        <input type="date" name="data" value="${escapeHtml(sale.data || "")}" />
+                      </label>
+                      <label>
+                        <span>Nome</span>
+                        <input type="text" name="nome" value="${escapeHtml(sale.nome || "")}" />
+                      </label>
+                      <label>
+                        <span>NIF</span>
+                        <input type="text" name="nif" value="${escapeHtml(sale.nif || "")}" />
+                      </label>
+                      <label>
+                        <span>ID Venda</span>
+                        <input type="text" name="idVenda" value="${escapeHtml(sale.idVenda || "")}" />
+                      </label>
+                      <label>
+                        <span>Nº Requisição</span>
+                        <input type="text" name="requisicao" value="${escapeHtml(sale.requisicao || "")}" />
+                      </label>
+                      <label>
+                        <span>Potência</span>
+                        <select name="potencia">
+                          ${buildSelectOptions(["1.15", "2.30", "3.45", "4.60", "5.75", "6.90", "10.35", "13.80", "17.25", "20.70", "27.60", "34.50", "41.40"], sale.potencia || "", true)}
+                        </select>
+                      </label>
+                      <label>
+                        <span>Estado</span>
+                        <select name="estado">
+                          ${buildSelectOptions(["Instalado", "Pendente", "Rejeitado"], sale.estado || "", true)}
+                        </select>
+                      </label>
+                      <label class="billing-inline-notes">
+                        <span>Observações</span>
+                        <textarea name="observacoes" rows="2">${escapeHtml(sale.observacoes === "-" ? "" : sale.observacoes || "")}</textarea>
+                      </label>
+                    </div>
+                    <div class="billing-inline-actions">
+                      <button type="submit" class="primary-button compact">Guardar</button>
+                      <button type="button" class="ghost-button compact" data-cancel-energy-inline="${energyIndex}">Cancelar</button>
+                    </div>
+                  </form>
+                </td>
+              </tr>
+            `
+            : ""
+        }
+      `;
+      }
     )
     .join("");
 }
@@ -2119,7 +2251,7 @@ function renderAccesses() {
     const entry = entries[service.id] || { user: "", password: "" };
     const hasData = Boolean(entry.user || entry.password);
     return `
-      <button type="button" class="access-service-button ${service.id === activeService.id ? "active" : ""}" data-access-service="${service.id}">
+      <button type="button" class="access-service-button ${service.id === activeService.id ? "active" : ""}" data-access-service="${service.id}" style="--access-service-tone: ${service.color || "#8fe56b"};">
         <span class="access-service-label">${escapeHtml(service.label)}</span>
         <span class="access-service-meta">${hasData ? "Credenciais guardadas" : "Ainda vazio"}</span>
       </button>
@@ -2333,7 +2465,7 @@ function renderGoals() {
   goalEnergyProgress.textContent = formatPercent(metrics.energyRatio * 100);
   goalTotalProgress.textContent = formatPercent(metrics.totalWeighted);
   goalInsuranceProgress.textContent = formatPercent(metrics.insuranceActualRatio * 100);
-  goalDiversityProgress.textContent = formatPercent(metrics.diversityProgressRatio * 100);
+  goalDiversityProgress.textContent = formatPercent(metrics.diversityActualRatio * 100);
 
   goalActualInsurance.textContent = formatPercent(metrics.insuranceActualRatio * 100);
   goalTargetInsurance.textContent = formatPercent(metrics.insuranceGoalRatio * 100);
@@ -2420,7 +2552,6 @@ function renderIncentives() {
 
   incentivesContent.innerHTML = INCENTIVES_CATALOG.map((brand) => {
     const brandId = slugify(brand.brand);
-    const brandLabel = brand.displayName || brand.brand;
     const sectionsMarkup = brand.sections
       .map((section) => {
         const rows = section.items
@@ -2450,9 +2581,6 @@ function renderIncentives() {
 
         return `
           <div class="support-block incentive-block incentive-tone-${section.tone}">
-            <div class="incentive-section-header">
-              <p class="support-title">${escapeHtml(section.title)}</p>
-            </div>
             <div class="table-wrap">
               <table>
                 <thead>
@@ -2473,12 +2601,6 @@ function renderIncentives() {
 
     return `
       <section class="incentive-brand ${selectedIncentiveBrand === brandId ? "active" : ""}" data-incentive-brand="${brandId}">
-        <div class="section-heading compact">
-          <div>
-            <p class="eyebrow">Marca</p>
-            <h3>${escapeHtml(brandLabel)}</h3>
-          </div>
-        </div>
         ${sectionsMarkup}
       </section>
     `;
@@ -2615,11 +2737,39 @@ function editEnergySale(index) {
   const sale = state.energySales[index];
   if (!sale) return;
 
-  editingEnergyIndex = index;
-  fillForm(energyForm, sale);
-  energyForm.elements.namedItem("observacoes").value =
-    sale.observacoes === "-" ? "" : sale.observacoes;
+  energyInlineEditingIndex = index;
+  editingEnergyIndex = null;
   activateTab("meo-energia");
+  renderEnergySales();
+}
+
+function cancelEnergyInlineEdit(index) {
+  if (energyInlineEditingIndex !== index) return;
+  energyInlineEditingIndex = null;
+  renderEnergySales();
+}
+
+async function saveEnergyInlineEdit(form) {
+  const formData = new FormData(form);
+  const energyIndex = Number(form.dataset.energyInlineForm || "");
+  const existingSale = state.energySales[energyIndex];
+  if (!existingSale) return;
+
+  const sale = {
+    ...existingSale,
+    data: valueAsText(formData.get("data")),
+    nome: valueAsText(formData.get("nome")),
+    nif: valueAsText(formData.get("nif")),
+    idVenda: valueAsText(formData.get("idVenda")),
+    requisicao: valueAsText(formData.get("requisicao")),
+    potencia: valueAsText(formData.get("potencia")),
+    estado: valueAsText(formData.get("estado")),
+    observacoes: valueAsText(formData.get("observacoes")) || "-",
+  };
+
+  state.energySales[energyIndex] = sale;
+  energyInlineEditingIndex = null;
+  await persistAndRender();
 }
 
 function editTask(index) {
@@ -2643,6 +2793,11 @@ function editStockEntry(index) {
 
 function deleteEnergySale(index) {
   state.energySales.splice(index, 1);
+  if (energyInlineEditingIndex === index) {
+    energyInlineEditingIndex = null;
+  } else if (energyInlineEditingIndex !== null && index < energyInlineEditingIndex) {
+    energyInlineEditingIndex -= 1;
+  }
   if (editingEnergyIndex === index) {
     editingEnergyIndex = null;
     energyForm.reset();
@@ -2714,6 +2869,9 @@ function getSearchTargetKey(target, element) {
   if (target.kind === "incentive-brand" || target.kind === "incentive-panel") return `brand:${target.brandId}`;
   if (target.kind === "access-service") return `access:${target.serviceId}`;
   if (target.kind === "panel") return `panel:${target.tabId}`;
+  if (target.kind === "billing-row") return `billing-row:${target.rowIndex}`;
+  if (target.kind === "mobile-row") return `mobile-row:${target.rowIndex}`;
+  if (target.kind === "energy-row") return `energy-row:${target.rowIndex}`;
 
   return fallbackKey;
 }
@@ -2726,6 +2884,36 @@ function resolveSearchTarget(element) {
       serviceId: accessButton.dataset.accessService || "",
       element: accessButton,
     };
+  }
+
+  const tableRow = element.closest("tbody tr");
+  if (tableRow && tableRow.dataset.searchRowIndex !== undefined) {
+    const billingTable = tableRow.closest(".billing-table");
+    if (billingTable) {
+      return {
+        kind: "billing-row",
+        rowIndex: Number(tableRow.dataset.searchRowIndex || "0"),
+        element: tableRow,
+      };
+    }
+
+    const mobileTable = tableRow.closest(".mobile-table");
+    if (mobileTable) {
+      return {
+        kind: "mobile-row",
+        rowIndex: Number(tableRow.dataset.searchRowIndex || "0"),
+        element: tableRow,
+      };
+    }
+
+    const energyTable = tableRow.closest(".meo-energy-table");
+    if (energyTable) {
+      return {
+        kind: "energy-row",
+        rowIndex: Number(tableRow.dataset.searchRowIndex || "0"),
+        element: tableRow,
+      };
+    }
   }
 
   const incentiveTab = element.closest(".incentive-tab");
@@ -2909,6 +3097,45 @@ function focusSearchTarget(target) {
       highlightSearchText(detail || target.element, sidebarSearchInput?.value || "");
       searchNavigationActive = false;
     }, 80);
+    return;
+  }
+
+  if (target.kind === "billing-row") {
+    searchNavigationActive = true;
+    activateTab("faturacao");
+    window.setTimeout(() => {
+      const row = document.querySelector(`.billing-table tbody tr[data-search-row-index="${target.rowIndex}"]`);
+      row?.scrollIntoView({ behavior: "smooth", block: "center" });
+      highlightSearchResult(row || target.element);
+      highlightSearchText(row || target.element, sidebarSearchInput?.value || "");
+      searchNavigationActive = false;
+    }, 60);
+    return;
+  }
+
+  if (target.kind === "mobile-row") {
+    searchNavigationActive = true;
+    activateTab("movel");
+    window.setTimeout(() => {
+      const row = document.querySelector(`.mobile-table tbody tr[data-search-row-index="${target.rowIndex}"]`);
+      row?.scrollIntoView({ behavior: "smooth", block: "center" });
+      highlightSearchResult(row || target.element);
+      highlightSearchText(row || target.element, sidebarSearchInput?.value || "");
+      searchNavigationActive = false;
+    }, 60);
+    return;
+  }
+
+  if (target.kind === "energy-row") {
+    searchNavigationActive = true;
+    activateTab("meo-energia");
+    window.setTimeout(() => {
+      const row = document.querySelector(`.meo-energy-table tbody tr[data-search-row-index="${target.rowIndex}"]`);
+      row?.scrollIntoView({ behavior: "smooth", block: "center" });
+      highlightSearchResult(row || target.element);
+      highlightSearchText(row || target.element, sidebarSearchInput?.value || "");
+      searchNavigationActive = false;
+    }, 60);
     return;
   }
 
@@ -3205,6 +3432,39 @@ function compareSaleDates(dateA, dateB) {
   const safeA = dateA || "9999-12-31";
   const safeB = dateB || "9999-12-31";
   return safeA.localeCompare(safeB);
+}
+
+function getBillingDateAccent(date) {
+  const safeDate = String(date || "0000-00-00");
+  let hash = 0;
+  for (let index = 0; index < safeDate.length; index += 1) {
+    hash = (hash * 31 + safeDate.charCodeAt(index)) >>> 0;
+  }
+  const palette = [
+    "#ff5b5b",
+    "#ff7a45",
+    "#ffb14a",
+    "#ffd84d",
+    "#b7ff4f",
+    "#73e85f",
+    "#34d399",
+    "#2dd4bf",
+    "#38bdf8",
+    "#60a5fa",
+    "#818cf8",
+    "#a855f7",
+    "#d946ef",
+    "#f472b6",
+    "#fb7185",
+    "#f43f5e",
+  ];
+  const accent = palette[hash % palette.length];
+  return {
+    accent,
+    soft: hexToRgba(accent, 0.06),
+    softer: hexToRgba(accent, 0.025),
+    text: getReadableTextColor(accent),
+  };
 }
 
 function updateMonthLabel() {
@@ -3523,6 +3783,84 @@ function applyVisualSettings() {
   document.documentElement.style.setProperty("--form-max-width", `${state.settings.formWidth}px`);
   document.documentElement.style.setProperty("--card-radius", `${state.settings.cardRadius}px`);
   document.documentElement.style.setProperty("--density-padding", `${densityPadding}px`);
+  applyMobileColumnWidths();
+}
+
+function applyMobileColumnWidths() {
+  if (!(mobileTable instanceof HTMLElement)) return;
+  const widths = state.settings.mobileColumnWidths || DEFAULT_MOBILE_COLUMN_WIDTHS;
+  MOBILE_COLUMN_KEYS.forEach((key) => {
+    const widthValue = Number(widths[key] || DEFAULT_MOBILE_COLUMN_WIDTHS[key] || 60);
+    mobileTable.style.setProperty(`--mobile-col-${key}-width`, `${widthValue}px`);
+  });
+}
+
+function initializeMobileColumnResizing() {
+  const handles = document.querySelectorAll("[data-mobile-column-resize]");
+  if (!handles.length) return;
+
+  handles.forEach((handle) => {
+    handle.addEventListener("pointerdown", (event) => {
+      if (!(event.currentTarget instanceof HTMLElement)) return;
+      const key = event.currentTarget.dataset.mobileColumnResize;
+      if (!key) return;
+
+      event.preventDefault();
+      mobileColumnResizeState = {
+        key,
+        startX: event.clientX,
+        startWidth: Number(state.settings.mobileColumnWidths?.[key] || DEFAULT_MOBILE_COLUMN_WIDTHS[key] || 60),
+      };
+      document.body.classList.add("is-resizing-mobile-columns");
+      event.currentTarget.setPointerCapture?.(event.pointerId);
+    });
+  });
+}
+
+function updateMobileColumnResize(event) {
+  if (!mobileColumnResizeState) return;
+  if (!Number.isFinite(event.clientX)) return;
+
+  const { key, startX, startWidth } = mobileColumnResizeState;
+  const delta = event.clientX - startX;
+  const nextWidth = clampMobileColumnWidth(key, startWidth + delta);
+  state.settings.mobileColumnWidths = {
+    ...DEFAULT_MOBILE_COLUMN_WIDTHS,
+    ...(state.settings.mobileColumnWidths || {}),
+    [key]: nextWidth,
+  };
+  applyMobileColumnWidths();
+}
+
+async function finishMobileColumnResize() {
+  if (!mobileColumnResizeState) return;
+  mobileColumnResizeState = null;
+  document.body.classList.remove("is-resizing-mobile-columns");
+  try {
+    await persistState();
+  } catch (error) {
+    console.error("Falha ao guardar larguras das colunas móveis:", error);
+  }
+}
+
+function clampMobileColumnWidth(key, value) {
+  const minWidths = {
+    data: 56,
+    nome: 96,
+    nif: 56,
+    numero: 56,
+    tarifario: 96,
+    idVenda: 52,
+    fidelizacao: 48,
+    portabilidade: 48,
+    bestOffer: 48,
+    netSegura: 52,
+    rceAceite: 48,
+    actions: 78,
+  };
+
+  const minWidth = minWidths[key] || 48;
+  return Math.max(minWidth, Math.min(260, Math.round(Number(value) || minWidth)));
 }
 
 function shadeColor(hex, percent) {

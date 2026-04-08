@@ -1,73 +1,59 @@
 {
   "billingSales": [
     {
-      "data": "2026-04-06",
-      "nif": "32323232",
-      "equipamento": "dsdsds",
-      "valor": 1200,
-      "valorSemIva": 975.61,
-      "seguro": "Sim",
-      "valorSeguro": 3.5,
-      "valorSeguroAnual": 42,
-      "categoria": "Smartphone",
-      "imei": "23323232323",
-      "fatura": "3232323232",
-      "modalidade": "Pronto Pagamento",
+      "data": "2026-04-09",
+      "nif": "",
+      "equipamento": "",
+      "valor": 0,
+      "valorSemIva": 0,
+      "seguro": "",
+      "valorSeguro": 0,
+      "valorSeguroAnual": 0,
+      "categoria": "",
+      "imei": "",
+      "fatura": "",
+      "modalidade": "",
+      "notas": "-"
+    },
+    {
+      "data": "2026-04-07",
+      "nif": "",
+      "equipamento": "",
+      "valor": 0,
+      "valorSemIva": 0,
+      "seguro": "",
+      "valorSeguro": 0,
+      "valorSeguroAnual": 0,
+      "categoria": "",
+      "imei": "",
+      "fatura": "",
+      "modalidade": "",
       "notas": "-"
     },
     {
       "data": "2026-04-01",
-      "nif": "323232323",
-      "equipamento": "iphone",
-      "valor": 1000,
-      "valorSemIva": 813.01,
-      "seguro": "Não",
-      "valorSeguro": 2.5,
-      "valorSeguroAnual": 30,
-      "categoria": "Smartphone",
+      "nif": "244634718",
+      "equipamento": "",
+      "valor": 0,
+      "valorSemIva": 0,
+      "seguro": "",
+      "valorSeguro": 0,
+      "valorSeguroAnual": 0,
+      "categoria": "",
       "imei": "",
       "fatura": "",
       "modalidade": "",
       "notas": "-"
     }
   ],
-  "mobileSales": [
-    {
-      "data": "2026-04-07",
-      "nome": "",
-      "nif": "",
-      "numero": "",
-      "tarifario": "",
-      "idVenda": "",
-      "fidelizacao": "",
-      "portabilidade": "",
-      "bestOffer": "",
-      "netSegura": "",
-      "rceAceite": "",
-      "formaAceitacao": ""
-    },
-    {
-      "data": "2026-04-01",
-      "nome": "gkjj lkjh lh lh lh l",
-      "nif": "545554545",
-      "numero": "767676786",
-      "tarifario": "M Movel 200GB",
-      "idVenda": "545454",
-      "fidelizacao": "Sim",
-      "portabilidade": "Sim",
-      "bestOffer": "Sim",
-      "netSegura": "Sim",
-      "rceAceite": "Sim",
-      "formaAceitacao": "Email"
-    }
-  ],
+  "mobileSales": [],
   "energySales": [],
   "tasks": [],
   "stockEntries": [],
   "accessEntries": {
     "sap-comercial": {
-      "user": "se244634718",
-      "password": "NayaraAndre*2028"
+      "user": "",
+      "password": ""
     },
     "portal-sfa": {
       "user": "",
@@ -99,31 +85,24 @@
     }
   },
   "monthlyIncentives": {
-    "2026-04": {},
-    "2026-05": {}
+    "2026-04": {}
   },
-  "monthlyGoals": {
-    "2026-04": {
-      "billing": 25000,
-      "mobile": 10,
-      "energy": 5
-    }
-  },
+  "monthlyGoals": {},
   "auth": {
-    "username": "Barroso",
-    "passwordHash": "05ee85897d3e11515a716cb96027225bb04f43e5736ca95df89d5930ae6a5c09"
+    "username": "admin",
+    "passwordHash": "ef5b4df1283b81ef25bd345116ad9e63f45dd488480e3832510cbc7f95910600"
   },
   "settings": {
     "theme": "light",
     "menuFontSize": 13,
-    "titleFontSize": 20,
-    "fieldFontSize": 15,
+    "titleFontSize": 22,
+    "fieldFontSize": 13,
     "panelHeaderSize": 13,
     "densityMode": "compact",
-    "primaryColor": "#1b61ac",
-    "secondaryColor": "#4a6887",
-    "sidebarColor": "#010057",
-    "toolbarColor": "#101e89",
+    "primaryColor": "#b6f23b",
+    "secondaryColor": "#1730a1",
+    "sidebarColor": "#102061",
+    "toolbarColor": "#b3262d",
     "sidebarTabColors": {
       "relatorios": "#f8d84c",
       "faturacao": "#4fd3ff",
@@ -139,10 +118,10 @@
       "configuracoes": "#f77dd6"
     },
     "pageColors": {
-      "relatorios": "#15146c",
+      "relatorios": "#14226d",
       "faturacao": "#16286f",
       "movel": "#132762",
-      "meo-energia": "#110e39",
+      "meo-energia": "#00224d",
       "objetivo": "#18295f",
       "geral": "#11285b",
       "tarefas": "#14325a",
@@ -154,34 +133,34 @@
     },
     "pageBlockColors": {
       "relatorios": "#13214d",
-      "faturacao": "#13214d",
+      "faturacao": "#041a62",
       "movel": "#13214d",
-      "meo-energia": "#162550",
-      "objetivo": "#031f7c",
+      "meo-energia": "#13214d",
+      "objetivo": "#13214d",
       "geral": "#13214d",
       "tarefas": "#13214d",
-      "apoio": "#071541",
-      "incentivos": "#000361",
+      "apoio": "#13214d",
+      "incentivos": "#13214d",
       "stock": "#13214d",
       "acessos": "#13214d",
-      "configuracoes": "#00034d"
+      "configuracoes": "#13214d"
     },
     "pageFieldColors": {
       "relatorios": "#0f1f56",
-      "faturacao": "#0f1f56",
+      "faturacao": "#0e193f",
       "movel": "#0f1f56",
-      "meo-energia": "#1e3a67",
-      "objetivo": "#212d54",
+      "meo-energia": "#0f1f56",
+      "objetivo": "#0f1f56",
       "geral": "#0f1f56",
       "tarefas": "#0f1f56",
-      "apoio": "#50368c",
-      "incentivos": "#ebf5f1",
+      "apoio": "#0f1f56",
+      "incentivos": "#0f1f56",
       "stock": "#0f1f56",
       "acessos": "#0f1f56",
-      "configuracoes": "#000000"
+      "configuracoes": "#0f1f56"
     },
-    "calculatorWidth": 280,
-    "formWidth": 580,
+    "calculatorWidth": 290,
+    "formWidth": 720,
     "cardRadius": 24
   }
 }
