@@ -4271,7 +4271,24 @@ body.theme-dark table {
   .sidebar {
     border-right: 0;
     border-bottom: 1px solid var(--line);
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "brand logout"
+      "search search"
+      "notif1 notif2"
+      "tabs tabs";
+    gap: 12px;
+    align-items: center;
   }
+
+  .sidebar > .brand { grid-area: brand; margin-bottom: 0; }
+  .sidebar > .logout-button { grid-area: logout; margin-top: 0; width: auto; padding: 8px 14px; }
+  .sidebar > .sidebar-search { grid-area: search; margin-bottom: 0; }
+  .sidebar > #tasks-notification-button { grid-area: notif1; margin-bottom: 0; height: 100%; }
+  .sidebar > #stock-notification-button { grid-area: notif2; margin-bottom: 0; height: 100%; }
+  .sidebar > .tabs { grid-area: tabs; margin-bottom: 0; }
 
   .tabs {
     display: flex;
@@ -4365,8 +4382,8 @@ body.theme-dark table {
   }
 
   .brand-logo {
-    width: 60px;
-    height: 60px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
   }
 
